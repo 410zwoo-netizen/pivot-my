@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIVOT STUDIO 진단서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #E5E5E5; color: #0E1B3A;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  padding: 20px; line-height: 1.5;
+}
+
+.toggle-bar {
+  max-width: 800px; margin: 0 auto 20px;
+  background: #0E1B3A; color: #fff; padding: 16px 20px; border-radius: 8px;
+  display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap;
+}
+.toggle-bar button {
+  padding: 8px 16px; border: 1px solid #D4AF37; background: transparent; color: #D4AF37;
+  font-family: inherit; font-weight: 600; font-size: 13px; border-radius: 4px; cursor: pointer;
+  transition: all 0.15s;
+}
+.toggle-bar button.active { background: #D4AF37; color: #0E1B3A; }
+.toggle-bar .lang-section {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: rgba(212,175,55,0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(212,175,55,0.3);
+}
+.toggle-bar .lang-section .lang-label {
+  font-size: 10px; color: rgba(212,175,55,0.8); 
+  letter-spacing: 0.15em; font-weight: 700;
+}
+.toggle-bar button.lang-btn {
+  padding: 5px 9px; font-size: 11px; font-weight: 700;
+  border-color: rgba(212,175,55,0.4);
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+.toggle-bar button.lang-btn:hover {
+  background: rgba(212,175,55,0.2);
+}
+.toggle-bar button.lang-btn.active {
+  background: #D4AF37; color: #0E1B3A;
+  border-color: #D4AF37;
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(212,175,55,0.4);
+}
+.toggle-bar .info { font-size: 12px; color: rgba(255,255,255,0.6); }
+.toggle-bar .status { font-size: 11px; padding: 4px 10px; border-radius: 3px; background: rgba(255,255,255,0.1); }
+.toggle-bar .status.loaded { background: rgba(46,204,113,0.2); color: #2ECC71; }
+.toggle-bar .status.error { background: rgba(231,76,60,0.2); color: #E74C3C; }
+
+/* === A4 === */
+.report.a4 {
+  width: 794px; height: 1123px; margin: 0 auto;
+  background: #FFFFFF; color: #0E1B3A;
+  position: relative; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column;
+  padding: 28px 36px 22px;
+}
+
+/* === 모바일 세로 긴 === */
+.report.mobile {
+  width: 540px; margin: 0 auto;
+  background: #FFFFFF; color: #0E1B3A;
+  position: relative; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 28px 24px 24px;
+  font-size: 13px;
+}
+.report.mobile .header img { height: 32px; }
+.report.mobile .title-row h2 { font-size: 24px; }
+.report.mobile .student-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; }
+.report.mobile .chart-section { flex-direction: column; gap: 14px; }
+.report.mobile .chart-wrap, .report.mobile .scores { width: 100%; }
+.report.mobile svg.radar { width: 290px; height: 290px; }
+
+.header { 
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding-bottom: 14px; border-bottom: 2px solid #0E1B3A;
+  flex-shrink: 0;
+}
+.header img { height: 36px; }
+.header .head-left .sub { font-size: 10px; letter-spacing: 0.3em; color: rgba(14,27,58,0.55); font-weight: 600; margin-top: 6px; }
+.header .date { text-align: right; font-size: 11px; color: rgba(14,27,58,0.6); line-height: 1.6; }
+.header .date strong { color: #C8302E; font-weight: 700; }
+
+.title-row { margin: 16px 0 12px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
+.title-row .label { font-size: 11px; letter-spacing: 0.25em; color: #C8302E; font-weight: 700; margin-bottom: 4px; }
+.title-row h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; }
+.track-badge { display: inline-block; padding: 6px 13px; background: #0E1B3A; color: #D4AF37; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; border-radius: 3px; }
+
+.student-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+  padding: 13px 14px; background: #FAF8F0; border-radius: 6px; margin-bottom: 14px;
+  flex-shrink: 0;
+}
+.student-grid .field .lab { font-size: 9.5px; letter-spacing: 0.1em; color: rgba(14,27,58,0.55); font-weight: 600; margin-bottom: 3px; }
+.student-grid .field .val { font-size: 13.5px; font-weight: 700; }
+
+.section-label { 
+  display: flex; align-items: center; gap: 8px; margin: 6px 0 5px;
+  font-size: 11px; letter-spacing: 0.25em; color: #D4AF37; font-weight: 700;
+  flex-shrink: 0;
+}
+.section-label::before { content: ''; width: 15px; height: 2px; background: #D4AF37; }
+
+.chart-section { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
+/* 긴 코멘트일 때 차트 살짝 축소 */
+.report.long-comment .chart-wrap svg.radar { width: 270px; height: 270px; }
+.chart-wrap { width: 46%; display: flex; justify-content: center; align-items: center; }
+.chart-wrap svg.radar { width: 300px; height: 300px; overflow: visible; }
+.scores { width: 54%; }
+.score-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 0.5px dashed rgba(14,27,58,0.15); }
+.score-row:last-child { border-bottom: none; }
+.score-row .name { flex: 1; font-size: 12.5px; font-weight: 600; }
+.score-row .bar { flex: 1.1; height: 6px; background: rgba(14,27,58,0.08); border-radius: 3px; overflow: hidden; }
+.score-row .bar .fill { height: 100%; background: #D4AF37; border-radius: 3px; }
+.score-row .num { width: 32px; text-align: right; font-size: 14px; font-weight: 800; }
+.score-row .grade { 
+  display: inline-block; padding: 2px 8px; border-radius: 3px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+  min-width: 38px; text-align: center;
+}
+.grade-1 { background: rgba(14,27,58,0.08); color: rgba(14,27,58,0.55); }
+.grade-2 { background: rgba(212,175,55,0.15); color: #8B7330; }
+.grade-3 { background: rgba(212,175,55,0.35); color: #6B5520; }
+.grade-4 { background: #D4AF37; color: #0E1B3A; }
+.grade-5 { background: #C8302E; color: #fff; }
+
+.score-avg .grade-big {
+  display: inline-block; padding: 4px 14px; margin-left: 10px;
+  border-radius: 4px; font-size: 13px; font-weight: 800; letter-spacing: 0.1em;
+  vertical-align: middle;
+}
+
+.grade-legend {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  padding: 6px 8px; margin: 4px 0 0;
+  font-size: 9px;
+  background: rgba(14,27,58,0.03); border-radius: 4px;
+}
+.grade-legend .item {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.grade-legend .dot {
+  display: inline-block; width: 9px; height: 9px; border-radius: 2px;
+}
+.grade-legend .label-small {
+  font-weight: 600; color: rgba(14,27,58,0.7); letter-spacing: 0.02em;
+}
+.score-avg { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(14,27,58,0.15); display: flex; justify-content: space-between; align-items: center; }
+.score-avg .lab { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: rgba(14,27,58,0.6); }
+.score-avg .val { font-size: 22px; font-weight: 800; color: #C8302E; }
+
+.summary-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 8px 0;
+  flex-shrink: 0;
+}
+.summary-card { padding: 9px 12px; background: #FAF8F0; border-left: 3px solid #D4AF37; border-radius: 0 5px 5px 0; }
+.summary-card.red { border-left-color: #C8302E; }
+.summary-card.dark { background: #0E1B3A; color: #fff; border-left-color: #D4AF37; }
+.summary-card .lab { font-size: 9.5px; letter-spacing: 0.2em; font-weight: 700; margin-bottom: 5px; color: #D4AF37; }
+.summary-card.red .lab { color: #C8302E; }
+.summary-card.dark .lab { color: #D4AF37; }
+.summary-card .val { font-size: 12px; font-weight: 700; line-height: 1.4; }
+
+.comment-line {
+  background: rgba(14,27,58,0.04); border-left: 3px solid #0E1B3A;
+  padding: 8px 12px; margin: 6px 0; border-radius: 0 4px 4px 0;
+  font-size: 12.5px; line-height: 1.55; font-style: italic; color: rgba(14,27,58,0.85);
+  flex-shrink: 0;
+}
+.comment-line::before { content: '\201C'; color: #D4AF37; font-size: 17px; font-weight: 800; margin-right: 4px; }
+.comment-line::after { content: '\201D'; color: #D4AF37; font-size: 17px; font-weight: 800; margin-left: 4px; }
+
+.prescription {
+  background: #0E1B3A; color: #FFFFFF; padding: 10px 14px; border-radius: 6px; margin-top: 3px;
+  flex-shrink: 0;
+}
+.prescription .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 0.5px solid rgba(212,175,55,0.3); }
+.prescription .head .lab { font-size: 11px; letter-spacing: 0.25em; color: #D4AF37; font-weight: 700; }
+.prescription .head .stamp { font-size: 10px; color: rgba(255,255,255,0.5); }
+.prescription .items { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.prescription .item { padding: 5px 9px; background: rgba(212,175,55,0.08); border-left: 2px solid #D4AF37; }
+.prescription .item .lab { font-size: 9.5px; letter-spacing: 0.15em; color: #D4AF37; font-weight: 600; margin-bottom: 2px; }
+.prescription .item .val { font-size: 11.5px; font-weight: 700; line-height: 1.35; }
+
+.footer-multi {
+  margin-top: auto; padding-top: 10px; padding-bottom: 0;
+  border-top: 1px solid rgba(14,27,58,0.15);
+  flex-shrink: 0;
+}
+.footer-brand {
+  font-size: 12.5px; letter-spacing: 0.2em; color: #0E1B3A; font-weight: 800;
+  text-align: center; margin-bottom: 6px;
+}
+.footer-divider {
+  width: 28px; height: 1.5px; background: #D4AF37; margin: 0 auto 7px;
+}
+.footer-branches {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  font-size: 9.5px; color: rgba(14,27,58,0.65); line-height: 1.5;
+  padding: 0 8px;
+}
+.footer-branch {
+  text-align: center;
+  min-width: 0;
+}
+.footer-branch .b-name {
+  font-weight: 700; color: #0E1B3A; margin-bottom: 3px;
+  letter-spacing: 0.01em; font-size: 9.5px;
+  white-space: nowrap;
+  overflow: visible;
+}
+.footer-branch .b-name .b-sns {
+  font-weight: 600; color: #D4AF37; font-size: 9px;
+  letter-spacing: 0.02em;
+}
+.footer-branch .b-addr {
+  font-size: 9px; color: rgba(14,27,58,0.55);
+  white-space: nowrap;
+}
+.report.mobile .footer-branches {
+  grid-template-columns: 1fr 1fr; gap: 12px; padding: 0;
+}
+.report.mobile .footer-branch .b-name {
+  font-size: 9px; white-space: normal;
+}
+.report.mobile .footer-branch .b-name .b-sns {
+  font-size: 8.5px; display: block; margin-top: 2px;
+}
+.report.mobile .footer-branch .b-addr { 
+  font-size: 8px; white-space: normal;
+}
+
+/* === 콘텐츠 길이별 자동 압축 모드 === */
+.report.content-medium .section-label { margin: 6px 0 5px; }
+.report.content-medium .summary-card { padding: 8px 11px; }
+.report.content-medium .prescription { padding: 9px 12px; }
+.report.content-medium .prescription .item { padding: 6px 9px; }
+.report.content-medium .comment-line { padding: 7px 11px; margin: 5px 0; }
+
+.report.content-long .section-label { margin: 4px 0 4px; font-size: 10.5px; }
+.report.content-long .summary-card { padding: 7px 10px; }
+.report.content-long .summary-card .lab { font-size: 9.5px; margin-bottom: 2px; }
+.report.content-long .prescription { padding: 8px 11px; }
+.report.content-long .prescription .head { margin-bottom: 6px; padding-bottom: 5px; }
+.report.content-long .prescription .item { padding: 6px 8px; }
+.report.content-long .prescription .item .lab { font-size: 9.5px; }
+.report.content-long .comment-line { padding: 6px 10px; margin: 4px 0; }
+.report.content-long .grade-legend { padding: 4px 6px; font-size: 8.5px; }
+
+.report.content-very-long .section-label { margin: 3px 0 3px; font-size: 10px; }
+.report.content-very-long .summary-card { padding: 6px 9px; }
+.report.content-very-long .summary-card .lab { font-size: 9px; margin-bottom: 1px; }
+.report.content-very-long .summary-grid { gap: 6px; margin-bottom: 5px; }
+.report.content-very-long .prescription { padding: 7px 10px; }
+.report.content-very-long .prescription .head { margin-bottom: 5px; padding-bottom: 4px; }
+.report.content-very-long .prescription .item { padding: 5px 8px; }
+.report.content-very-long .prescription .item .lab { font-size: 9px; margin-bottom: 1px; }
+.report.content-very-long .prescription .items { gap: 5px; }
+.report.content-very-long .comment-line { padding: 5px 9px; margin: 3px 0; }
+.report.content-very-long .grade-legend { padding: 3px 6px; font-size: 8.5px; margin: 3px 0; }
+.report.content-very-long .footer-multi { padding-top: 9px; }
+.report.content-very-long .footer-brand { font-size: 11.5px; margin-bottom: 6px; }
+.report.content-very-long .footer-divider { margin: 0 auto 7px; }
+
+
+.watermark {
+  position: absolute; right: -90px; bottom: 90px;
+  width: 360px; height: 360px; opacity: 0.04; pointer-events: none;
+}
+.report.mobile .watermark { width: 280px; height: 280px; right: -60px; bottom: 100px; }
+
+@media print {
+  body { background: white; padding: 0; }
+  .toggle-bar { display: none; }
+  .report { box-shadow: none; }
+  .report.mobile { display: none; }
+  @page { size: A4; margin: 0; }
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="toggle-bar">
+  <strong style="color: #D4AF37;">📋 PIVOT 진단서</strong>
+  <button id="btn-a4" class="active" onclick="show('a4')">A4 인쇄용</button>
+  <button id="btn-mobile" onclick="show('mobile')">모바일 PDF</button>
+  <span class="lang-section">
+    <span class="lang-label">LANG</span>
+    <button class="lang-btn active" data-lang="kr" onclick="setLang('kr')">🇰🇷 KR</button>
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">🇺🇸 EN</button>
+    <button class="lang-btn" data-lang="jp" onclick="setLang('jp')">🇯🇵 JP</button>
+    <button class="lang-btn" data-lang="cn" onclick="setLang('cn')">🇨🇳 CN</button>
+  </span>
+  <button onclick="runDiagnose()" style="background:#C8302E;color:#fff;border:none;padding:6px 12px;border-radius:4px;font-weight:700;font-size:11px;cursor:pointer;margin-left:8px;">🔍 진단</button>
+  <span class="status" id="data-status">샘플 데이터</span>
+  <span class="info">Ctrl/Cmd + P로 PDF 저장</span>
+</div>
+
+<!-- A4 -->
+<div class="report a4" id="report-a4">
+  <svg class="watermark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 20 30 L 180 30 L 100 175 Z" fill="none" stroke="#0E1B3A" stroke-width="2"/>
+  </svg>
+
+  <div class="header">
+    <div class="head-left">
+      <img src="data:image/png;base64,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" alt="PIVOT STUDIO" style="filter: invert(1);">
+      <p class="sub" data-i18n="report">DIAGNOSIS REPORT</p>
+    </div>
+    <p class="date">
+      <span data-i18n="date_label">진단일자</span> · <strong data-field="date">2026 . 06 . XX</strong><br>
+      <span data-i18n="number_label">진단번호</span> · <strong data-field="number">2026-001</strong><br>
+      <span data-i18n="trainer_label">진단 트레이너</span> · <strong data-field="trainer">XXX</strong>
+    </p>
+  </div>
+
+  <div class="title-row">
+    <div>
+      <p class="label">— <span data-i18n="system_name">PIVOT 진단 시스템</span></p>
+      <h2 data-i18n="main_title">PIVOT STUDIO 진단서</h2>
+    </div>
+    <div class="track-badge" data-field="track">입시 트랙</div>
+  </div>
+
+  <div class="student-grid">
+    <div class="field"><p class="lab" data-i18n="student">STUDENT</p><p class="val" data-field="name">김지우</p></div>
+    <div class="field"><p class="lab" data-i18n="grade">GRADE</p><p class="val" data-field="grade">고등학교 2학년</p></div>
+    <div class="field"><p class="lab" data-i18n="genre">GENRE</p><p class="val" data-field="genre">코레오 · 힙합</p></div>
+  </div>
+
+  <p class="section-label"><span data-i18n="section_diagnosis">진단 결과 · DIAGNOSIS</span></p>
+
+  <div class="chart-section">
+    <div class="chart-wrap">
+      <svg class="radar" id="radar-a4" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1">
+          <polygon points="150,30 264.85,113.43 221,247.57 79,247.57 35.15,113.43"/>
+          <polygon points="150,60 234.64,121.57 201.75,222.18 98.25,222.18 65.36,121.57"/>
+          <polygon points="150,90 204.43,129.72 182.5,196.79 117.5,196.79 95.57,129.72"/>
+          <polygon points="150,120 174.21,137.86 163.25,171.39 136.75,171.39 125.79,137.86"/>
+        </g>
+        <g stroke="rgba(14,27,58,0.15)" stroke-width="1">
+          <line x1="150" y1="150" x2="150" y2="30"/>
+          <line x1="150" y1="150" x2="264.85" y2="113.43"/>
+          <line x1="150" y1="150" x2="221" y2="247.57"/>
+          <line x1="150" y1="150" x2="79" y2="247.57"/>
+          <line x1="150" y1="150" x2="35.15" y2="113.43"/>
+        </g>
+        <polygon class="data-area" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="2.5"/>
+        <g class="data-points" fill="#C8302E"></g>
+        <g font-family="Pretendard, sans-serif" font-weight="700" font-size="12" fill="#0E1B3A">
+          <text x="150" y="18" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
+          <text x="295" y="115" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
+          <text x="240" y="275" text-anchor="middle" data-i18n="score_expr">표현력</text>
+          <text x="60" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
+          <text x="5" y="115" text-anchor="middle" data-i18n="score_potential">잠재력</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="scores">
+      <div class="score-row"><span class="name" data-i18n="score_rhythm">리듬 & 그루브</span><div class="bar"><div class="fill" data-bar="0"></div></div><span class="num" data-score="0">8.5</span><span class="grade grade-4" data-grade="0">우수</span></div>
+      <div class="score-row"><span class="name" data-i18n="score_iso">아이솔레이션</span><div class="bar"><div class="fill" data-bar="1"></div></div><span class="num" data-score="1">7.0</span><span class="grade grade-3" data-grade="1">양호</span></div>
+      <div class="score-row"><span class="name" data-i18n="score_expr">표현력</span><div class="bar"><div class="fill" data-bar="2"></div></div><span class="num" data-score="2">7.5</span><span class="grade grade-3" data-grade="2">양호</span></div>
+      <div class="score-row"><span class="name" data-i18n="score_learn">습득력</span><div class="bar"><div class="fill" data-bar="3"></div></div><span class="num" data-score="3">8.0</span><span class="grade grade-4" data-grade="3">우수</span></div>
+      <div class="score-row"><span class="name" data-i18n="score_potential">잠재력</span><div class="bar"><div class="fill" data-bar="4"></div></div><span class="num" data-score="4">9.0</span><span class="grade grade-4" data-grade="4">우수</span></div>
+      <div class="score-avg">
+        <span class="lab" data-i18n="avg_label">5개 항목 평균</span>
+        <div>
+          <span class="val" data-field="avg">8.0</span>
+          <span class="grade-big grade-4" data-avg-grade>우수</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grade-legend">
+  <div class="item"><span class="dot grade-1"></span><span class="label-small" data-i18n="grade_basic">기초 (0~3.5)</span></div>
+  <div class="item"><span class="dot grade-2"></span><span class="label-small" data-i18n="grade_growing">발전 (4~5.5)</span></div>
+  <div class="item"><span class="dot grade-3"></span><span class="label-small" data-i18n="grade_good">양호 (6~7.5)</span></div>
+  <div class="item"><span class="dot grade-4"></span><span class="label-small" data-i18n="grade_excellent">우수 (8~9)</span></div>
+  <div class="item"><span class="dot grade-5"></span><span class="label-small" data-i18n="grade_outstanding">탁월 (9.5~10)</span></div>
+</div>
+
+  <p class="section-label"><span data-i18n="section_summary">종합 진단 · SUMMARY</span></p>
+
+  <div class="summary-grid">
+    <div class="summary-card"><p class="lab" data-i18n="level_label">현재 수준</p><p class="val" data-field="level">평균 8.0점 · 동급 상위 30%</p></div>
+    <div class="summary-card dark"><p class="lab" data-i18n="goal_label">학생 목표</p><p class="val" data-field="goal">서경대 · 서울예대</p></div>
+    <div class="summary-card red"><p class="lab" data-i18n="strength_label">강점</p><p class="val" data-field="strength">잠재력 우수, 리듬감 우수</p></div>
+    <div class="summary-card red"><p class="lab" data-i18n="weakness_label">보완 필요</p><p class="val" data-field="weakness">아이솔레이션 강화</p></div>
+  </div>
+
+  <div class="comment-line" data-field="comment">
+    타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.
+  </div>
+
+  <p class="section-label"><span data-i18n="section_prescription">맞춤 처방 · PRESCRIPTION</span></p>
+
+  <div class="prescription">
+    <div class="head">
+      <span class="lab" data-i18n="prescription_label">PIVOT 맞춤 커리큘럼</span>
+      <span class="stamp" data-field="stamp">No. 2026-001</span>
+    </div>
+    <div class="items">
+      <div class="item"><p class="lab">CLASS</p><p class="val" data-field="class">입시 전문반, 코레오 중급</p></div>
+      <div class="item"><p class="lab">TRAINER</p><p class="val" data-field="rec_trainer">XXX · YYY 트레이너</p></div>
+      <div class="item"><p class="lab">FOCUS</p><p class="val" data-field="focus">아이솔레이션 강화, 표현력 보강</p></div>
+      <div class="item"><p class="lab">SCHEDULE</p><p class="val" data-field="schedule">주 3회</p></div>
+    </div>
+  </div>
+
+  <div class="footer-multi">
+    <div class="footer-brand">PIVOT STUDIO</div>
+    <div class="footer-divider"></div>
+    <div class="footer-branches">
+      <div class="footer-branch">
+        <div class="b-name"><span data-i18n="branch_hufs">외대점</span> · <span class="b-sns">@pivot410studio_hufs</span></div>
+        <div class="b-addr" data-i18n="addr_hufs">서울 동대문구 이문동 324-4, 3층</div>
+      </div>
+      <div class="footer-branch">
+        <div class="b-name"><span data-i18n="branch_bangbae">방배점</span> · <span class="b-sns">pivot410studio_bangbae</span></div>
+        <div class="b-addr" data-i18n="addr_bangbae">서울 서초구 방배동 907-10, 3층</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 모바일 세로 긴 -->
+<div class="report mobile hidden" id="report-mobile">
+  <svg class="watermark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 20 30 L 180 30 L 100 175 Z" fill="none" stroke="#0E1B3A" stroke-width="2"/>
+  </svg>
+
+  <div class="header">
+    <div class="head-left">
+      <img src="data:image/png;base64,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" alt="PIVOT STUDIO" style="filter: invert(1);">
+      <p class="sub" data-i18n="report">DIAGNOSIS REPORT</p>
+    </div>
+    <p class="date">
+      <strong data-field="date">2026 . 06 . XX</strong><br>
+      No. <strong data-field="number">2026-001</strong><br>
+      TRAINER <strong data-field="trainer">XXX</strong>
+    </p>
+  </div>
+
+  <div class="title-row">
+    <div>
+      <p class="label">— <span data-i18n="system_name">PIVOT 진단 시스템</span></p>
+      <h2 data-i18n="main_title">PIVOT STUDIO 진단서</h2>
+    </div>
+    <div class="track-badge" data-field="track">입시 트랙</div>
+  </div>
+
+  <div class="student-grid">
+    <div class="field"><p class="lab" data-i18n="student">STUDENT</p><p class="val" data-field="name">김지우</p></div>
+    <div class="field"><p class="lab" data-i18n="grade">GRADE</p><p class="val" data-field="grade">고등학교 2학년</p></div>
+    <div class="field"><p class="lab" data-i18n="genre">GENRE</p><p class="val" data-field="genre">코레오 · 힙합</p></div>
+  </div>
+
+  <p class="section-label"><span data-i18n="section_diagnosis">진단 결과 · DIAGNOSIS</span></p>
+
+  <div class="chart-wrap">
+    <svg class="radar" id="radar-mobile" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1">
+        <polygon points="150,30 264.85,113.43 221,247.57 79,247.57 35.15,113.43"/>
+        <polygon points="150,60 234.64,121.57 201.75,222.18 98.25,222.18 65.36,121.57"/>
+        <polygon points="150,90 204.43,129.72 182.5,196.79 117.5,196.79 95.57,129.72"/>
+        <polygon points="150,120 174.21,137.86 163.25,171.39 136.75,171.39 125.79,137.86"/>
+      </g>
+      <g stroke="rgba(14,27,58,0.15)" stroke-width="1">
+        <line x1="150" y1="150" x2="150" y2="30"/>
+        <line x1="150" y1="150" x2="264.85" y2="113.43"/>
+        <line x1="150" y1="150" x2="221" y2="247.57"/>
+        <line x1="150" y1="150" x2="79" y2="247.57"/>
+        <line x1="150" y1="150" x2="35.15" y2="113.43"/>
+      </g>
+      <polygon class="data-area" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="2.5"/>
+      <g class="data-points" fill="#C8302E"></g>
+      <g font-family="Pretendard, sans-serif" font-weight="700" font-size="13" fill="#0E1B3A">
+        <text x="150" y="18" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
+        <text x="295" y="115" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
+        <text x="240" y="275" text-anchor="middle" data-i18n="score_expr">표현력</text>
+        <text x="60" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
+        <text x="5" y="115" text-anchor="middle" data-i18n="score_potential">잠재력</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="scores" style="margin-top: 10px;">
+    <div class="score-row"><span class="name" data-i18n="score_rhythm">리듬 & 그루브</span><div class="bar"><div class="fill" data-bar="0"></div></div><span class="num" data-score="0">8.5</span><span class="grade grade-4" data-grade="0">우수</span></div>
+    <div class="score-row"><span class="name" data-i18n="score_iso">아이솔레이션</span><div class="bar"><div class="fill" data-bar="1"></div></div><span class="num" data-score="1">7.0</span><span class="grade grade-3" data-grade="1">양호</span></div>
+    <div class="score-row"><span class="name" data-i18n="score_expr">표현력</span><div class="bar"><div class="fill" data-bar="2"></div></div><span class="num" data-score="2">7.5</span><span class="grade grade-3" data-grade="2">양호</span></div>
+    <div class="score-row"><span class="name" data-i18n="score_learn">습득력</span><div class="bar"><div class="fill" data-bar="3"></div></div><span class="num" data-score="3">8.0</span><span class="grade grade-4" data-grade="3">우수</span></div>
+    <div class="score-row"><span class="name" data-i18n="score_potential">잠재력</span><div class="bar"><div class="fill" data-bar="4"></div></div><span class="num" data-score="4">9.0</span><span class="grade grade-4" data-grade="4">우수</span></div>
+    <div class="score-avg">
+      <span class="lab" data-i18n="avg_label">5개 항목 평균</span>
+      <div>
+        <span class="val" data-field="avg">8.0</span>
+        <span class="grade-big grade-4" data-avg-grade>우수</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grade-legend">
+  <div class="item"><span class="dot grade-1"></span><span class="label-small" data-i18n="grade_basic">기초 (0~3.5)</span></div>
+  <div class="item"><span class="dot grade-2"></span><span class="label-small" data-i18n="grade_growing">발전 (4~5.5)</span></div>
+  <div class="item"><span class="dot grade-3"></span><span class="label-small" data-i18n="grade_good">양호 (6~7.5)</span></div>
+  <div class="item"><span class="dot grade-4"></span><span class="label-small" data-i18n="grade_excellent">우수 (8~9)</span></div>
+  <div class="item"><span class="dot grade-5"></span><span class="label-small" data-i18n="grade_outstanding">탁월 (9.5~10)</span></div>
+</div>
+
+  <p class="section-label"><span data-i18n="section_summary">종합 진단 · SUMMARY</span></p>
+
+  <div class="summary-grid">
+    <div class="summary-card"><p class="lab" data-i18n="level_label">현재 수준</p><p class="val" data-field="level">평균 8.0점 · 상위 30%</p></div>
+    <div class="summary-card dark"><p class="lab" data-i18n="goal_label">학생 목표</p><p class="val" data-field="goal">서경대 · 서울예대</p></div>
+    <div class="summary-card red"><p class="lab" data-i18n="strength_label">강점</p><p class="val" data-field="strength">잠재력 우수, 리듬감 우수</p></div>
+    <div class="summary-card red"><p class="lab" data-i18n="weakness_label">보완 필요</p><p class="val" data-field="weakness">아이솔레이션 강화</p></div>
+  </div>
+
+  <div class="comment-line" data-field="comment">
+    타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.
+  </div>
+
+  <p class="section-label"><span data-i18n="section_prescription">맞춤 처방 · PRESCRIPTION</span></p>
+
+  <div class="prescription">
+    <div class="head">
+      <span class="lab" data-i18n="prescription_label">PIVOT 맞춤 커리큘럼</span>
+      <span class="stamp" data-field="stamp">No. 2026-001</span>
+    </div>
+    <div class="items">
+      <div class="item"><p class="lab">CLASS</p><p class="val" data-field="class">입시 전문반</p></div>
+      <div class="item"><p class="lab">TRAINER</p><p class="val" data-field="rec_trainer">XXX · YYY</p></div>
+      <div class="item"><p class="lab">FOCUS</p><p class="val" data-field="focus">아이솔레이션 강화</p></div>
+      <div class="item"><p class="lab">SCHEDULE</p><p class="val" data-field="schedule">주 3회</p></div>
+    </div>
+  </div>
+
+  <div class="footer-multi" style="margin-top: 24px;">
+    <div class="footer-brand">PIVOT STUDIO</div>
+    <div class="footer-divider"></div>
+    <div class="footer-branches">
+      <div class="footer-branch">
+        <div class="b-name"><span data-i18n="branch_hufs">외대점</span> · <span class="b-sns">@pivot410studio_hufs</span></div>
+        <div class="b-addr" data-i18n="addr_hufs">서울 동대문구 이문동 324-4, 3층</div>
+      </div>
+      <div class="footer-branch">
+        <div class="b-name"><span data-i18n="branch_bangbae">방배점</span> · <span class="b-sns">pivot410studio_bangbae</span></div>
+        <div class="b-addr" data-i18n="addr_bangbae">서울 서초구 방배동 907-10, 3층</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================================
+// 구글시트 연동 설정
+// ========================================
+// 연결된 시트: PIVOT 진단 데이터
+// https://docs.google.com/spreadsheets/d/1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4/edit
+const SHEET_ID = '1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4'; // ← 박힘
+const SHEET_NAME = '시트1'; // 시트 탭 이름
+
+// 시트 열 구성 (변경 시 여기 동기화 필요)
+const COLUMNS = {
+  number: 0,        // A: 진단번호
+  date: 1,          // B: 진단일자 (강사 입력: 5/20 또는 5-20)
+  date_formatted: 22, // W: 진단일자 자동변환 (시트 수식이 자동 생성: 2026.05.20)
+  trainer: 2,       // C: 진단 트레이너
+  name: 3,          // D: 학생 이름
+  grade: 4,         // E: 학년
+  track: 5,         // F: 트랙 (입시/아이돌/댄서/취미)
+  genre: 6,         // G: 장르
+  branch: 7,        // H: 점포
+  goal: 8,          // I: 학생 목표
+  score_rhythm: 9,  // J: 리듬&그루브 (0~10)
+  score_iso: 10,    // K: 아이솔레이션 (0~10)
+  score_expr: 11,   // L: 표현력 (0~10)
+  score_learn: 12,  // M: 습득력 (0~10)
+  score_potential: 13, // N: 잠재력 (0~10)
+  level: 14,        // O: (자동계산, 시트 입력 불필요) 또는 강사 메모용
+  strength: 15,     // P: 강점
+  weakness: 16,     // Q: 보완 필요
+  comment: 17,      // R: 한줄 코멘트
+  rec_class: 18,    // S: 추천 클래스
+  rec_trainer: 19,  // T: 추천 트레이너
+  focus: 20,        // U: 집중 영역
+  schedule: 21      // V: 주간 일정
+};
+
+// ========================================
+// 등급 시스템 + 차트 좌표
+// ========================================
+
+// 시트 데이터의 옵션 텍스트를 i18n 키로 변환 (강화 버전)
+function normalizeText(s) {
+  // 보이지 않는 특수 문자 모두 제거
+  return String(s)
+    .replace(/[\u200B-\u200D\uFEFF\u00A0\u2060]/g, '') // zero-width, NBSP 등
+    .replace(/\s+/g, ' ')                                    // 연속 공백 → 단일 공백
+    .trim();
+}
+
+function textToKey(text) {
+  // 정규화 + 키 변환
+  let key = normalizeText(text)
+    .replace(/1\s*:\s*1/g, '1대1')          // "1:1" 또는 "1 : 1" → "1대1"
+    .replace(/\s*\+\s*/g, '_')             // " + " → "_"
+    .replace(/\s+/g, '_');                    // 공백 → "_"
+  return 'opt_' + key;
+}
+
+function translateOptions(text) {
+  if (!text) return '';
+  const lang = I18N[currentLang];
+  
+  // 분리자: 쉼표, 가운뎃점(·), 슬래시(/), 줄바꿈
+  // 단, 공백 + 단어 + ", " 패턴은 다중 선택, 공백만 있는 건 단일 옵션
+  const parts = String(text).split(/[,·\/\n]/).map(s => normalizeText(s)).filter(s => s);
+  
+  const translated = parts.map(part => {
+    const key = textToKey(part);
+    if (lang[key]) return lang[key];
+    
+    // Fallback 1: 한국어 사전에서 정확한 키 찾기 (혹시 모를 정규화 차이)
+    const krLang = I18N.kr;
+    for (const [k, v] of Object.entries(krLang)) {
+      if (k.startsWith('opt_') && normalizeText(v) === part) {
+        // 한국어 사전에서 찾았으면 현재 언어 사전에서 같은 키 반환
+        if (lang[k]) return lang[k];
+      }
+    }
+    
+    // Fallback 2: 부분 매칭 (정확히 안 맞아도 키 일부가 일치)
+    // 예: "잠재력우수" (공백 없음) → opt_잠재력_우수 매칭
+    const partNoSpace = part.replace(/\s+/g, '');
+    for (const [k, v] of Object.entries(krLang)) {
+      if (k.startsWith('opt_')) {
+        const vNoSpace = String(v).replace(/\s+/g, '');
+        if (vNoSpace === partNoSpace && lang[k]) return lang[k];
+      }
+    }
+    
+    // 매칭 실패 → 원본 그대로
+    return part;
+  });
+  
+  const sep = currentLang === 'kr' ? ' · ' : ', ';
+  return translated.join(sep);
+}
+
+// 점수 → 등급 변환
+function getGrade(score) {
+  const t = I18N[currentLang];
+  if (score < 4) return { label: t.g_기초, cls: 'grade-1' };
+  if (score < 6) return { label: t.g_발전, cls: 'grade-2' };
+  if (score < 8) return { label: t.g_양호, cls: 'grade-3' };
+  if (score < 9.5) return { label: t.g_우수, cls: 'grade-4' };
+  return { label: t.g_탁월, cls: 'grade-5' };
+}
+
+function calcRadarPoints(scores) {
+  // 5각형 정점의 각도 (위쪽부터 시계방향)
+  const angles = [-90, -18, 54, 126, 198]; // degrees
+  const center = 150;
+  const maxRadius = 120; // 점수 10점 만점 = 반지름 120
+  
+  return scores.map((score, i) => {
+    const rad = angles[i] * Math.PI / 180;
+    const r = (score / 10) * maxRadius;  // 10점 만점
+    const x = center + r * Math.cos(rad);
+    const y = center + r * Math.sin(rad);
+    return { x: x.toFixed(2), y: y.toFixed(2) };
+  });
+}
+
+function updateChart(svgId, scores) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  
+  const points = calcRadarPoints(scores);
+  const polygonPoints = points.map(p => `${p.x},${p.y}`).join(' ');
+  
+  svg.querySelector('.data-area').setAttribute('points', polygonPoints);
+  
+  const pointsGroup = svg.querySelector('.data-points');
+  pointsGroup.innerHTML = points.map(p => 
+    `<circle cx="${p.x}" cy="${p.y}" r="4"/>`
+  ).join('');
+}
+
+
+// ========================================
+// 다국어 사전 (한국어, 영어, 일본어, 중국어)
+// ========================================
+const I18N = {
+  kr: {
+    report: 'DIAGNOSIS REPORT',
+    report_short: 'DIAGNOSIS',
+    date_label: '진단일자',
+    number_label: '진단번호',
+    trainer_label: '진단 트레이너',
+    system_name: 'PIVOT 진단 시스템',
+    main_title: 'PIVOT STUDIO 진단서',
+    student: 'STUDENT',
+    grade: 'GRADE',
+    genre: 'GENRE',
+    branch: 'BRANCH',
+    section_diagnosis: '진단 결과 · DIAGNOSIS',
+    section_summary: '종합 진단 · SUMMARY',
+    section_prescription: '맞춤 처방 · PRESCRIPTION',
+    score_rhythm: '리듬 & 그루브',
+    score_iso: '아이솔레이션',
+    score_expr: '표현력',
+    score_learn: '습득력',
+    score_potential: '잠재력',
+    avg_label: '5개 항목 평균',
+    avg_label_short: '평균',
+    grade_basic: '기초 (0~3.5)',
+    grade_growing: '발전 (4~5.5)',
+    grade_good: '양호 (6~7.5)',
+    grade_excellent: '우수 (8~9)',
+    grade_outstanding: '탁월 (9.5~10)',
+    level_label: '현재 수준',
+    goal_label: '학생 목표',
+    strength_label: '강점',
+    weakness_label: '보완 필요',
+    prescription_label: 'PIVOT 맞춤 커리큘럼',
+    // 트랙
+    track_입시: '입시 트랙',
+    track_아이돌: '아이돌 트랙',
+    track_댄서: '댄서 트랙',
+    track_취미: '취미 트랙',
+    // 등급 (요약 카드용)
+    g_기초: '기초', g_발전: '발전', g_양호: '양호', g_우수: '우수', g_탁월: '탁월',
+    // 상위 %
+    pct_top5: '상위 5%', pct_top10: '상위 10%', pct_top20: '상위 20%',
+    pct_top30: '상위 30%', pct_top40: '상위 40%', pct_top50: '상위 50%',
+    pct_top60: '상위 60%', pct_top70: '상위 70%',
+    pct_avg: '평균 수준', pct_basic: '기초 단계',
+    // 현재 수준 포맷
+    level_format: (avg, pct, grade) => `평균 ${avg}점 · ${pct} · ${grade}`,
+    branch_hufs: '외대점',
+    branch_bangbae: '방배점',
+    addr_hufs: '서울 동대문구 이문동 324-4, 3층',
+    addr_bangbae: '서울 서초구 방배동 907-10, 3층',
+    // 강점/보완 옵션 (시트 P, Q 열 드롭다운 값)
+    opt_잠재력_우수: '잠재력 우수',
+    opt_리듬감_우수: '리듬감 우수',
+    opt_그루브_우수: '그루브 우수',
+    opt_아이솔레이션_정확: '아이솔레이션 정확',
+    opt_표현력_풍부: '표현력 풍부',
+    opt_습득력_빠름: '습득력 빠름',
+    opt_음악성_뛰어남: '음악성 뛰어남',
+    opt_기본기_안정: '기본기 안정',
+    opt_신체조건_우수: '신체 조건 우수',
+    opt_무대장악력: '무대 장악력',
+    opt_밸런스_우수: '밸런스 우수',
+    opt_유연성_우수: '유연성 우수',
+    opt_체력_우수: '체력 우수',
+    opt_멘탈_좋음: '멘탈 좋음',
+    opt_학습의지_강함: '학습 의지 강함',
+    opt_리듬감_강화: '리듬감 강화',
+    opt_그루브_강화: '그루브 강화',
+    opt_아이솔레이션_강화: '아이솔레이션 강화',
+    opt_표현력_보강: '표현력 보강',
+    opt_습득력_향상: '습득력 향상',
+    opt_기본기_다지기: '기본기 다지기',
+    opt_자세_교정: '자세 교정',
+    opt_유연성_향상: '유연성 향상',
+    opt_체력_강화: '체력 강화',
+    opt_자신감_향상: '자신감 향상',
+    opt_손목_디테일: '손목 디테일',
+    opt_손가락_디테일: '손가락 디테일',
+    opt_고개_디테일: '고개 디테일',
+    opt_팔꿈치_디테일: '팔꿈치 디테일',
+    opt_음악_해석력: '음악 해석력',
+    opt_디테일_표현: '디테일 표현',
+    opt_안무_정확도: '안무 정확도',
+    opt_호흡_관리: '호흡 관리',
+    opt_발끝_디테일: '발끝 디테일',
+    // 추천 클래스
+    opt_입시_전문반: '입시 전문반',
+    opt_코레오_초급: '코레오 초급',
+    opt_코레오_중급: '코레오 중급',
+    opt_코레오_중상급: '코레오 중상급',
+    opt_힙합_클래스: '힙합 클래스',
+    opt_왁킹_클래스: '왁킹 클래스',
+    opt_케이팝_클래스: '케이팝 클래스',
+    opt_기본기반: '기본기반',
+    opt_주니어_기본기반: '주니어 기본기반',
+    opt_1대1_개인레슨: '1:1 개인 레슨',
+    // 학년 옵션
+    opt_미취학: '7세 이하 (미취학)',
+    opt_초등_1학년: '초등 1학년',
+    opt_초등_2학년: '초등 2학년',
+    opt_초등_3학년: '초등 3학년',
+    opt_초등_4학년: '초등 4학년',
+    opt_초등_5학년: '초등 5학년',
+    opt_초등_6학년: '초등 6학년',
+    opt_중학교_1학년: '중학교 1학년',
+    opt_중학교_2학년: '중학교 2학년',
+    opt_중학교_3학년: '중학교 3학년',
+    opt_고등학교_1학년: '고등학교 1학년',
+    opt_고등학교_2학년: '고등학교 2학년',
+    opt_고등학교_3학년: '고등학교 3학년',
+    opt_성인_재수_N수: '성인 (재수/N수)',
+    opt_일반_성인: '일반 성인',
+    // 스케줄 옵션
+    opt_주_1회: '주 1회',
+    opt_주_2회: '주 2회',
+    opt_주_3회: '주 3회',
+    opt_주_4회: '주 4회',
+    opt_주_5회_이상: '주 5회 이상',
+    opt_개인_레슨: '개인 레슨',
+    opt_개인레슨: '개인 레슨',
+    // 장르 옵션
+    opt_코레오: '코레오',
+    opt_힙합: '힙합',
+    opt_왁킹: '왁킹',
+    opt_케이팝: '케이팝',
+    opt_락킹: '락킹',
+    opt_하우스: '하우스',
+    opt_걸스힙합: '걸스힙합',
+    // 트랙
+    opt_입시: '입시',
+    opt_아이돌: '아이돌',
+    opt_댄서: '댄서',
+    opt_취미: '취미'
+  },
+  en: {
+    report: 'DIAGNOSIS REPORT',
+    report_short: 'DIAGNOSIS',
+    date_label: 'Date',
+    number_label: 'No.',
+    trainer_label: 'Trainer',
+    system_name: 'PIVOT Diagnosis System',
+    main_title: 'PIVOT STUDIO Diagnosis',
+    student: 'STUDENT',
+    grade: 'GRADE',
+    genre: 'GENRE',
+    branch: 'BRANCH',
+    section_diagnosis: 'Diagnosis Results',
+    section_summary: 'Summary',
+    section_prescription: 'Prescription',
+    score_rhythm: 'Rhythm & Groove',
+    score_iso: 'Isolation',
+    score_expr: 'Expression',
+    score_learn: 'Learning',
+    score_potential: 'Potential',
+    avg_label: 'Overall Average',
+    avg_label_short: 'Average',
+    grade_basic: 'Basic (0-3.5)',
+    grade_growing: 'Growing (4-5.5)',
+    grade_good: 'Good (6-7.5)',
+    grade_excellent: 'Excellent (8-9)',
+    grade_outstanding: 'Outstanding (9.5-10)',
+    level_label: 'Current Level',
+    goal_label: 'Student Goal',
+    strength_label: 'Strengths',
+    weakness_label: 'To Improve',
+    prescription_label: 'Custom Curriculum',
+    track_입시: 'College Track',
+    track_아이돌: 'Idol Track',
+    track_댄서: 'Dancer Track',
+    track_취미: 'Hobby Track',
+    g_기초: 'Basic', g_발전: 'Growing', g_양호: 'Good', g_우수: 'Excellent', g_탁월: 'Outstanding',
+    pct_top5: 'Top 5%', pct_top10: 'Top 10%', pct_top20: 'Top 20%',
+    pct_top30: 'Top 30%', pct_top40: 'Top 40%', pct_top50: 'Top 50%',
+    pct_top60: 'Top 60%', pct_top70: 'Top 70%',
+    pct_avg: 'Average Level', pct_basic: 'Beginning Stage',
+    level_format: (avg, pct, grade) => `Avg ${avg} · ${pct} · ${grade}`,
+    branch_hufs: 'Hufs Branch',
+    branch_bangbae: 'Bangbae Branch',
+    addr_hufs: 'Imun-dong 324-4, 3F, Dongdaemun-gu, Seoul',
+    addr_bangbae: 'Bangbae-dong 907-10, 3F, Seocho-gu, Seoul',
+    // 강점/보완 옵션
+    opt_잠재력_우수: 'Outstanding Potential',
+    opt_리듬감_우수: 'Excellent Rhythm',
+    opt_그루브_우수: 'Excellent Groove',
+    opt_아이솔레이션_정확: 'Accurate Isolation',
+    opt_표현력_풍부: 'Rich Expression',
+    opt_습득력_빠름: 'Fast Learning',
+    opt_음악성_뛰어남: 'Outstanding Musicality',
+    opt_기본기_안정: 'Stable Fundamentals',
+    opt_신체조건_우수: 'Excellent Physique',
+    opt_무대장악력: 'Stage Presence',
+    opt_밸런스_우수: 'Excellent Balance',
+    opt_유연성_우수: 'Excellent Flexibility',
+    opt_체력_우수: 'Excellent Stamina',
+    opt_멘탈_좋음: 'Strong Mental',
+    opt_학습의지_강함: 'Strong Motivation',
+    opt_리듬감_강화: 'Improve Rhythm',
+    opt_그루브_강화: 'Improve Groove',
+    opt_아이솔레이션_강화: 'Improve Isolation',
+    opt_표현력_보강: 'Improve Expression',
+    opt_습득력_향상: 'Improve Learning',
+    opt_기본기_다지기: 'Build Fundamentals',
+    opt_자세_교정: 'Posture Correction',
+    opt_유연성_향상: 'Improve Flexibility',
+    opt_체력_강화: 'Build Stamina',
+    opt_자신감_향상: 'Build Confidence',
+    opt_손목_디테일: 'Wrist Detail',
+    opt_손가락_디테일: 'Finger Detail',
+    opt_고개_디테일: 'Head Detail',
+    opt_팔꿈치_디테일: 'Elbow Detail',
+    opt_음악_해석력: 'Music Interpretation',
+    opt_디테일_표현: 'Detail Expression',
+    opt_안무_정확도: 'Choreography Accuracy',
+    opt_호흡_관리: 'Breath Control',
+    opt_발끝_디테일: 'Foot Detail',
+    // 추천 클래스
+    opt_입시_전문반: 'College Prep Class',
+    opt_코레오_초급: 'Choreography Basic',
+    opt_코레오_중급: 'Choreography Intermediate',
+    opt_코레오_중상급: 'Choreography Upper-Inter.',
+    opt_힙합_클래스: 'Hip-Hop Class',
+    opt_왁킹_클래스: 'Waacking Class',
+    opt_케이팝_클래스: 'K-POP Class',
+    opt_기본기반: 'Fundamentals',
+    opt_주니어_기본기반: 'Junior Fundamentals',
+    opt_1대1_개인레슨: '1:1 Private Lesson',
+    // 학년
+    opt_미취학: 'Preschool (under 7)',
+    opt_초등_1학년: 'Elementary 1st',
+    opt_초등_2학년: 'Elementary 2nd',
+    opt_초등_3학년: 'Elementary 3rd',
+    opt_초등_4학년: 'Elementary 4th',
+    opt_초등_5학년: 'Elementary 5th',
+    opt_초등_6학년: 'Elementary 6th',
+    opt_중학교_1학년: 'Middle School 1st',
+    opt_중학교_2학년: 'Middle School 2nd',
+    opt_중학교_3학년: 'Middle School 3rd',
+    opt_고등학교_1학년: 'High School 1st',
+    opt_고등학교_2학년: 'High School 2nd',
+    opt_고등학교_3학년: 'High School 3rd',
+    opt_성인_재수_N수: 'Adult (Retake)',
+    opt_일반_성인: 'Adult',
+    // 스케줄
+    opt_주_1회: '1x / week',
+    opt_주_2회: '2x / week',
+    opt_주_3회: '3x / week',
+    opt_주_4회: '4x / week',
+    opt_주_5회_이상: '5x+ / week',
+    opt_개인_레슨: 'Private Lesson',
+    opt_개인레슨: 'Private Lesson',
+    // 장르
+    opt_코레오: 'Choreography',
+    opt_힙합: 'Hip-Hop',
+    opt_왁킹: 'Waacking',
+    opt_케이팝: 'K-POP',
+    opt_락킹: 'Locking',
+    opt_하우스: 'House',
+    opt_걸스힙합: 'Girls Hip-Hop',
+    // 트랙
+    opt_입시: 'College Prep',
+    opt_아이돌: 'Idol',
+    opt_댄서: 'Dancer',
+    opt_취미: 'Hobby'
+  },
+  jp: {
+    report: 'DIAGNOSIS REPORT',
+    report_short: 'DIAGNOSIS',
+    date_label: '診断日',
+    number_label: '番号',
+    trainer_label: 'トレーナー',
+    system_name: 'PIVOT 診断システム',
+    main_title: 'PIVOT STUDIO 診断書',
+    student: '学生',
+    grade: '学年',
+    genre: 'ジャンル',
+    branch: '支店',
+    section_diagnosis: '診断結果',
+    section_summary: '総合診断',
+    section_prescription: 'カスタム処方',
+    score_rhythm: 'リズム&グルーブ',
+    score_iso: 'アイソレーション',
+    score_expr: '表現力',
+    score_learn: '習得力',
+    score_potential: 'ポテンシャル',
+    avg_label: '5項目平均',
+    avg_label_short: '平均',
+    grade_basic: '基礎 (0~3.5)',
+    grade_growing: '発展 (4~5.5)',
+    grade_good: '良好 (6~7.5)',
+    grade_excellent: '優秀 (8~9)',
+    grade_outstanding: '卓越 (9.5~10)',
+    level_label: '現在のレベル',
+    goal_label: '学生の目標',
+    strength_label: '強み',
+    weakness_label: '改善点',
+    prescription_label: 'PIVOTカスタムカリキュラム',
+    track_입시: '入試トラック',
+    track_아이돌: 'アイドルトラック',
+    track_댄서: 'ダンサートラック',
+    track_취미: '趣味トラック',
+    g_기초: '基礎', g_발전: '発展', g_양호: '良好', g_우수: '優秀', g_탁월: '卓越',
+    pct_top5: '上位5%', pct_top10: '上位10%', pct_top20: '上位20%',
+    pct_top30: '上位30%', pct_top40: '上位40%', pct_top50: '上位50%',
+    pct_top60: '上位60%', pct_top70: '上位70%',
+    pct_avg: '平均レベル', pct_basic: '基礎段階',
+    level_format: (avg, pct, grade) => `平均${avg}点 · ${pct} · ${grade}`,
+    branch_hufs: '外大店',
+    branch_bangbae: '方背店',
+    addr_hufs: 'ソウル特別市東大門区里門洞 324-4, 3F',
+    addr_bangbae: 'ソウル特別市瑞草区方背洞 907-10, 3F',
+    // 강점/보완 옵션
+    opt_잠재력_우수: 'ポテンシャル優秀',
+    opt_리듬감_우수: 'リズム感優秀',
+    opt_그루브_우수: 'グルーブ優秀',
+    opt_아이솔레이션_정확: 'アイソレーション正確',
+    opt_표현력_풍부: '表現力豊か',
+    opt_습득력_빠름: '習得力速い',
+    opt_음악성_뛰어남: '音楽性優秀',
+    opt_기본기_안정: '基本動作安定',
+    opt_신체조건_우수: '身体条件優秀',
+    opt_무대장악력: 'ステージ掌握力',
+    opt_밸런스_우수: 'バランス優秀',
+    opt_유연성_우수: '柔軟性優秀',
+    opt_체력_우수: '体力優秀',
+    opt_멘탈_좋음: 'メンタル良好',
+    opt_학습의지_강함: '学習意欲強い',
+    opt_리듬감_강화: 'リズム感強化',
+    opt_그루브_강화: 'グルーブ強化',
+    opt_아이솔레이션_강화: 'アイソレーション強化',
+    opt_표현력_보강: '表現力補強',
+    opt_습득력_향상: '習得力向上',
+    opt_기본기_다지기: '基本動作強化',
+    opt_자세_교정: '姿勢矯正',
+    opt_유연성_향상: '柔軟性向上',
+    opt_체력_강화: '体力強化',
+    opt_자신감_향상: '自信向上',
+    opt_손목_디테일: '手首ディテール',
+    opt_손가락_디테일: '指ディテール',
+    opt_고개_디테일: '頭ディテール',
+    opt_팔꿈치_디테일: '肘ディテール',
+    opt_음악_해석력: '音楽解釈力',
+    opt_디테일_표현: 'ディテール表現',
+    opt_안무_정확도: '振付正確度',
+    opt_호흡_관리: '呼吸管理',
+    opt_발끝_디테일: 'つま先ディテール',
+    // 추천 클래스
+    opt_입시_전문반: '入試専門クラス',
+    opt_코레오_초급: 'コレオ初級',
+    opt_코레오_중급: 'コレオ中級',
+    opt_코레오_중상급: 'コレオ中上級',
+    opt_힙합_클래스: 'ヒップホップクラス',
+    opt_왁킹_클래스: 'ワッキングクラス',
+    opt_케이팝_클래스: 'K-POPクラス',
+    opt_기본기반: '基本動作クラス',
+    opt_주니어_기본기반: 'ジュニア基本動作',
+    opt_1대1_개인레슨: 'マンツーマンレッスン',
+    // 학년
+    opt_미취학: '未就学児',
+    opt_초등_1학년: '小学1年',
+    opt_초등_2학년: '小学2年',
+    opt_초등_3학년: '小学3年',
+    opt_초등_4학년: '小学4年',
+    opt_초등_5학년: '小学5年',
+    opt_초등_6학년: '小学6年',
+    opt_중학교_1학년: '中学1年',
+    opt_중학교_2학년: '中学2年',
+    opt_중학교_3학년: '中学3年',
+    opt_고등학교_1학년: '高校1年',
+    opt_고등학교_2학년: '高校2年',
+    opt_고등학교_3학년: '高校3年',
+    opt_성인_재수_N수: '成人 (浪人)',
+    opt_일반_성인: '成人',
+    // 스케줄
+    opt_주_1회: '週1回',
+    opt_주_2회: '週2回',
+    opt_주_3회: '週3回',
+    opt_주_4회: '週4回',
+    opt_주_5회_이상: '週5回以上',
+    opt_개인_레슨: 'マンツーマンレッスン',
+    opt_개인레슨: 'マンツーマンレッスン',
+    // 장르
+    opt_코레오: 'コレオ',
+    opt_힙합: 'ヒップホップ',
+    opt_왁킹: 'ワッキング',
+    opt_케이팝: 'K-POP',
+    opt_락킹: 'ロッキング',
+    opt_하우스: 'ハウス',
+    opt_걸스힙합: 'ガールズヒップホップ',
+    // 트랙
+    opt_입시: '入試',
+    opt_아이돌: 'アイドル',
+    opt_댄서: 'ダンサー',
+    opt_취미: '趣味'
+  },
+  cn: {
+    report: 'DIAGNOSIS REPORT',
+    report_short: 'DIAGNOSIS',
+    date_label: '诊断日期',
+    number_label: '编号',
+    trainer_label: '诊断教练',
+    system_name: 'PIVOT 诊断系统',
+    main_title: 'PIVOT STUDIO 诊断书',
+    student: '学生',
+    grade: '年级',
+    genre: '类型',
+    branch: '分店',
+    section_diagnosis: '诊断结果',
+    section_summary: '综合诊断',
+    section_prescription: '定制处方',
+    score_rhythm: '节奏&律动',
+    score_iso: '关节运动',
+    score_expr: '表现力',
+    score_learn: '学习力',
+    score_potential: '潜力',
+    avg_label: '5项平均',
+    avg_label_short: '平均',
+    grade_basic: '基础 (0~3.5)',
+    grade_growing: '成长 (4~5.5)',
+    grade_good: '良好 (6~7.5)',
+    grade_excellent: '优秀 (8~9)',
+    grade_outstanding: '卓越 (9.5~10)',
+    level_label: '现状水平',
+    goal_label: '学生目标',
+    strength_label: '优势',
+    weakness_label: '待改进',
+    prescription_label: 'PIVOT 定制课程',
+    track_입시: '升学方向',
+    track_아이돌: '偶像方向',
+    track_댄서: '舞者方向',
+    track_취미: '兴趣方向',
+    g_기초: '基础', g_발전: '成长', g_양호: '良好', g_우수: '优秀', g_탁월: '卓越',
+    pct_top5: '前5%', pct_top10: '前10%', pct_top20: '前20%',
+    pct_top30: '前30%', pct_top40: '前40%', pct_top50: '前50%',
+    pct_top60: '前60%', pct_top70: '前70%',
+    pct_avg: '平均水平', pct_basic: '基础阶段',
+    level_format: (avg, pct, grade) => `平均${avg}分 · ${pct} · ${grade}`,
+    branch_hufs: '外大店',
+    branch_bangbae: '方背店',
+    addr_hufs: '首尔东大门区里门洞 324-4, 3楼',
+    addr_bangbae: '首尔瑞草区方背洞 907-10, 3楼',
+    // 강점/보완 옵션
+    opt_잠재력_우수: '潜力优秀',
+    opt_리듬감_우수: '节奏感优秀',
+    opt_그루브_우수: '律动感优秀',
+    opt_아이솔레이션_정확: '关节运动准确',
+    opt_표현력_풍부: '表现力丰富',
+    opt_습득력_빠름: '学习力快',
+    opt_음악성_뛰어남: '音乐性优秀',
+    opt_기본기_안정: '基本功扎实',
+    opt_신체조건_우수: '身体条件优秀',
+    opt_무대장악력: '舞台掌控力',
+    opt_밸런스_우수: '平衡感优秀',
+    opt_유연성_우수: '柔韧性优秀',
+    opt_체력_우수: '体力优秀',
+    opt_멘탈_좋음: '心态良好',
+    opt_학습의지_강함: '学习意愿强',
+    opt_리듬감_강화: '加强节奏感',
+    opt_그루브_강화: '加强律动感',
+    opt_아이솔레이션_강화: '加强关节运动',
+    opt_표현력_보강: '加强表现力',
+    opt_습득력_향상: '提升学习力',
+    opt_기본기_다지기: '夯实基本功',
+    opt_자세_교정: '体态矫正',
+    opt_유연성_향상: '提升柔韧性',
+    opt_체력_강화: '加强体力',
+    opt_자신감_향상: '提升自信',
+    opt_손목_디테일: '手腕细节',
+    opt_손가락_디테일: '手指细节',
+    opt_고개_디테일: '头部细节',
+    opt_팔꿈치_디테일: '肘部细节',
+    opt_음악_해석력: '音乐解读力',
+    opt_디테일_표현: '细节表现',
+    opt_안무_정확도: '编舞准确度',
+    opt_호흡_관리: '呼吸管理',
+    opt_발끝_디테일: '脚尖细节',
+    // 추천 클래스
+    opt_입시_전문반: '升学专门班',
+    opt_코레오_초급: '编舞初级',
+    opt_코레오_중급: '编舞中级',
+    opt_코레오_중상급: '编舞中高级',
+    opt_힙합_클래스: '嘻哈课',
+    opt_왁킹_클래스: 'Waacking课',
+    opt_케이팝_클래스: 'K-POP课',
+    opt_기본기반: '基本功班',
+    opt_주니어_기본기반: '少儿基本功',
+    opt_1대1_개인레슨: '一对一私教',
+    // 학년
+    opt_미취학: '学前 (7岁以下)',
+    opt_초등_1학년: '小学1年级',
+    opt_초등_2학년: '小学2年级',
+    opt_초등_3학년: '小学3年级',
+    opt_초등_4학년: '小学4年级',
+    opt_초등_5학년: '小学5年级',
+    opt_초등_6학년: '小学6年级',
+    opt_중학교_1학년: '初中1年级',
+    opt_중학교_2학년: '初中2年级',
+    opt_중학교_3학년: '初中3年级',
+    opt_고등학교_1학년: '高中1年级',
+    opt_고등학교_2학년: '高中2年级',
+    opt_고등학교_3학년: '高中3年级',
+    opt_성인_재수_N수: '成人 (复读)',
+    opt_일반_성인: '成人',
+    // 스케줄
+    opt_주_1회: '每周1次',
+    opt_주_2회: '每周2次',
+    opt_주_3회: '每周3次',
+    opt_주_4회: '每周4次',
+    opt_주_5회_이상: '每周5次以上',
+    opt_개인_레슨: '一对一私教',
+    opt_개인레슨: '一对一私教',
+    // 장르
+    opt_코레오: '编舞',
+    opt_힙합: '嘻哈',
+    opt_왁킹: 'Waacking',
+    opt_케이팝: 'K-POP',
+    opt_락킹: 'Locking',
+    opt_하우스: 'House',
+    opt_걸스힙합: '女子嘻哈',
+    // 트랙
+    opt_입시: '升学',
+    opt_아이돌: '偶像',
+    opt_댄서: '舞者',
+    opt_취미: '兴趣'
+  }
+};
+
+// (지점 정보는 I18N의 branch_hufs/branch_bangbae/addr_hufs/addr_bangbae 키로 통합)
+
+// 현재 언어
+let currentLang = 'kr';
+
+// 언어 변경
+function setLang(lang) {
+  if (!I18N[lang]) return;
+  currentLang = lang;
+  
+  // 모든 data-i18n 요소 번역
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (I18N[lang][key]) {
+      el.textContent = I18N[lang][key];
+    }
+  });
+  
+  // 언어 버튼 활성화 표시
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+  
+  // 시트 데이터 다시 적용 (현재 수준, 트랙 등 동적 텍스트 번역)
+  if (window.__lastCells) {
+    applyData(window.__lastCells);
+  } else {
+    // 샘플 데이터로 다시 그리기
+    applySampleData();
+  }
+}
+
+// URL에서 언어 파라미터 읽기
+function getLangFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const lang = params.get('lang');
+  return I18N[lang] ? lang : 'kr';
+}
+
+
+
+// ========================================
+// 시트 데이터 가져오기
+// ========================================
+function showDebugBox(message, type) {
+  // 토글 바 아래에 큰 디버그 박스 표시
+  let box = document.getElementById('debug-box');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'debug-box';
+    box.style.cssText = 'position:fixed; top:70px; left:50%; transform:translateX(-50%); padding:14px 24px; border-radius:6px; font-family:Pretendard,sans-serif; font-weight:600; font-size:14px; z-index:9999; max-width:80%; text-align:center; box-shadow:0 4px 16px rgba(0,0,0,0.3); white-space:pre-line;';
+    document.body.appendChild(box);
+  }
+  if (type === 'error') {
+    box.style.background = '#C8302E';
+    box.style.color = '#fff';
+  } else if (type === 'success') {
+    box.style.background = '#2E8B57';
+    box.style.color = '#fff';
+  } else {
+    box.style.background = '#D4AF37';
+    box.style.color = '#0E1B3A';
+  }
+  box.textContent = message;
+}
+
+
+// === 디버그 진단 함수 ===
+async function runDiagnose() {
+  const cells = window.__lastCells;
+  if (!cells) {
+    alert('시트 데이터가 아직 로드 안 됨. id 파라미터 확인하세요.');
+    return;
+  }
+  
+  // 디버그할 컬럼들 (P, Q, S, U, V)
+  const debugCols = [
+    { idx: 15, name: 'P열(강점)' },
+    { idx: 16, name: 'Q열(보완필요)' },
+    { idx: 18, name: 'S열(추천클래스)' },
+    { idx: 20, name: 'U열(집중영역)' },
+    { idx: 21, name: 'V열(주간일정)' },
+    { idx: 4, name: 'E열(학년)' },
+    { idx: 6, name: 'G열(장르)' }
+  ];
+  
+  let output = '🔍 시트 데이터 진단 결과\n\n현재 언어: ' + currentLang + '\n\n';
+  
+  for (const col of debugCols) {
+    const cell = cells[col.idx];
+    if (!cell || !cell.v) {
+      output += '【' + col.name + '】 (비어있음)\n\n';
+      continue;
+    }
+    
+    const raw = String(cell.v);
+    output += '【' + col.name + '】\n';
+    output += '원본: "' + raw + '"\n';
+    output += '길이: ' + raw.length + '자\n';
+    
+    // 보이지 않는 특수 문자 찾기
+    const hidden = [];
+    for (let i = 0; i < raw.length; i++) {
+      const code = raw.charCodeAt(i);
+      // ASCII 인쇄 가능 범위 밖 + 한글/일반 문자 아닌 것
+      if (code === 0x00A0) hidden.push({pos: i, name: 'NBSP(non-breaking space)', code: '0xA0'});
+      else if (code === 0x200B) hidden.push({pos: i, name: 'Zero-Width Space', code: '0x200B'});
+      else if (code === 0x200C) hidden.push({pos: i, name: 'Zero-Width Non-Joiner', code: '0x200C'});
+      else if (code === 0x200D) hidden.push({pos: i, name: 'Zero-Width Joiner', code: '0x200D'});
+      else if (code === 0xFEFF) hidden.push({pos: i, name: 'BOM', code: '0xFEFF'});
+      else if (code === 0x2060) hidden.push({pos: i, name: 'Word Joiner', code: '0x2060'});
+      else if (code === 0x3000) hidden.push({pos: i, name: '전각 공백', code: '0x3000'});
+      else if (code === 0x0009) hidden.push({pos: i, name: '탭', code: '0x09'});
+      else if (code >= 0x2000 && code <= 0x200A) hidden.push({pos: i, name: '특수 공백', code: '0x' + code.toString(16)});
+    }
+    
+    if (hidden.length > 0) {
+      output += '⚠️ 보이지 않는 특수 문자 ' + hidden.length + '개 발견:\n';
+      hidden.forEach(h => {
+        output += '  - 위치 ' + h.pos + ': ' + h.name + ' (' + h.code + ')\n';
+      });
+    } else {
+      output += '✓ 보이지 않는 특수 문자 없음\n';
+    }
+    
+    // 옵션별 매칭 테스트
+    const parts = raw.split(/[,·\/\n]/).map(s => s.trim()).filter(s => s);
+    output += '분리된 옵션 ' + parts.length + '개:\n';
+    parts.forEach(part => {
+      const key = textToKey(part);
+      const enVal = I18N.en[key];
+      const matched = enVal ? '✓ ' + enVal : '✗ 매칭 실패';
+      output += '  - "' + part + '" → ' + key + ' → ' + matched + '\n';
+    });
+    
+    output += '\n';
+  }
+  
+  // 큰 모달로 표시
+  let modal = document.getElementById('diagnose-modal');
+  if (modal) modal.remove();
+  
+  modal = document.createElement('div');
+  modal.id = 'diagnose-modal';
+  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;padding:40px;overflow:auto;';
+  modal.innerHTML = '<div style="background:#0E1B3A;color:#fff;padding:30px;border-radius:8px;max-width:800px;margin:0 auto;font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.6;"><div style="display:flex;justify-content:space-between;margin-bottom:20px;"><strong style="color:#D4AF37;font-size:18px;">진단 결과</strong><button onclick="document.getElementById(\'diagnose-modal\').remove()" style="background:#C8302E;color:#fff;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;">닫기</button></div>' + output.replace(/\n/g, '<br>') + '<div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(212,175,55,0.3);"><button onclick="navigator.clipboard.writeText(this.parentElement.parentElement.innerText);alert(\'복사됨\')" style="background:#D4AF37;color:#0E1B3A;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:700;">📋 결과 복사 (스크린샷 대신)</button></div></div>';
+  document.body.appendChild(modal);
+}
+
+async function loadFromSheet() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const statusEl = document.getElementById('data-status');
+  
+  if (!id) {
+    if (statusEl) statusEl.textContent = '샘플 데이터 (URL에 ?id=2026-001 추가 시 시트 연동)';
+    return;
+  }
+  
+  if (!SHEET_ID) {
+    showDebugBox('⚠️ 시트 ID 미설정', 'error');
+    return;
+  }
+  
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    
+    const res = await fetch(url);
+    
+    if (!res.ok) {
+      showDebugBox(`⚠️ 시트 접근 실패 (HTTP ${res.status})\n시트가 "링크가 있는 모든 사용자"로 공개되어 있는지 확인하세요.`, 'error');
+      return;
+    }
+    
+    const text = await res.text();
+    
+    // gviz 응답이 JSONP라 앞 47자 잘라야 함. 응답 형식 확인
+    if (text.length < 50) {
+      showDebugBox(`⚠️ 시트 응답이 너무 짧음 (${text.length}자)\n시트가 공개되어 있는지, 시트1 탭이 존재하는지 확인.`, 'error');
+      return;
+    }
+    
+    let json;
+    try {
+      json = JSON.parse(text.substring(47, text.length - 2));
+    } catch (e) {
+      showDebugBox(`⚠️ 시트 응답 파싱 실패: ${e.message}\n앞 100자: ${text.substring(0, 100)}`, 'error');
+      return;
+    }
+    
+    if (!json.table || !json.table.rows) {
+      showDebugBox(`⚠️ 시트 데이터 구조 오류 (table 또는 rows 없음)\n시트1 탭 이름과 데이터 확인하세요.`, 'error');
+      return;
+    }
+    
+    const rows = json.table.rows;
+    
+    if (rows.length === 0) {
+      showDebugBox(`⚠️ 시트가 비어있음 (행 0개)\nA2에 ${id} 입력했는지 확인.`, 'error');
+      return;
+    }
+    
+    const targetRow = rows.find(r => 
+      r.c && r.c[COLUMNS.number] && r.c[COLUMNS.number].v == id
+    );
+    
+    if (!targetRow) {
+      // 시트의 모든 진단번호 나열
+      const allIds = rows.map(r => r.c && r.c[0] && r.c[0].v).filter(v => v).join(', ');
+      showDebugBox(`⚠️ 진단번호 "${id}" 미발견\n시트에 있는 진단번호: ${allIds || '(없음)'}`, 'error');
+      return;
+    }
+    
+    applyData(targetRow.c);
+    showDebugBox(`✓ 시트 데이터 로드 성공 (No. ${id})`, 'success');
+    // 3초 후 자동 숨김
+    setTimeout(() => {
+      const box = document.getElementById('debug-box');
+      if (box) box.style.display = 'none';
+    }, 3000);
+    
+    if (statusEl) statusEl.classList.add('loaded');
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = '⚠️ 시트 로드 실패';
+    statusEl.classList.add('error');
+  }
+}
+
+function getCellValue(cells, idx) {
+  return (cells[idx] && cells[idx].v !== null) ? cells[idx].v : '';
+}
+
+// 구글시트 날짜 파싱 (시간대 문제 해결)
+function formatDate(rawValue, rawFormatted) {
+  // 시트에서 f (formatted value)를 우선 사용 → 시간대 문제 없음
+  if (rawFormatted) return rawFormatted;
+  if (!rawValue) return '';
+  
+  // Date(2026,5,20) 같은 문자열로 들어오는 경우 처리
+  const dateMatch = String(rawValue).match(/Date\((\d+),(\d+),(\d+)/);
+  if (dateMatch) {
+    const y = dateMatch[1];
+    const m = String(parseInt(dateMatch[2]) + 1).padStart(2, '0'); // 구글시트 월은 0부터
+    const d = String(dateMatch[3]).padStart(2, '0');
+    return `${y} . ${m} . ${d}`;
+  }
+  
+  return rawValue;
+}
+
+// 점수 → 추정 상위 % (PIVOT 학원 누적 데이터 기준 추정)
+function getPercentile(avgScore) {
+  const t = I18N[currentLang];
+  if (avgScore >= 9.5) return t.pct_top5;
+  if (avgScore >= 9.0) return t.pct_top10;
+  if (avgScore >= 8.5) return t.pct_top20;
+  if (avgScore >= 8.0) return t.pct_top30;
+  if (avgScore >= 7.5) return t.pct_top40;
+  if (avgScore >= 7.0) return t.pct_top50;
+  if (avgScore >= 6.5) return t.pct_top60;
+  if (avgScore >= 6.0) return t.pct_top70;
+  if (avgScore >= 5.0) return t.pct_avg;
+  return t.pct_basic;
+}
+
+function applyData(cells) {
+  window.__lastCells = cells;
+
+  // 텍스트 필드
+  const textFields = {
+    'number': `No. ${getCellValue(cells, COLUMNS.number)}`,
+    'stamp': `No. ${getCellValue(cells, COLUMNS.number)}`,
+    'date': (() => {
+      // W열(자동변환)이 있으면 우선 사용
+      const w = getCellValue(cells, COLUMNS.date_formatted);
+      if (w) return w;
+      // 없으면 B열 fallback
+      return formatDate(getCellValue(cells, COLUMNS.date), cells[COLUMNS.date] && cells[COLUMNS.date].f);
+    })(),
+    'trainer': getCellValue(cells, COLUMNS.trainer),
+    'name': getCellValue(cells, COLUMNS.name),
+    'grade': translateOptions(getCellValue(cells, COLUMNS.grade)),
+    'track': (() => {
+      const t = getCellValue(cells, COLUMNS.track);
+      return I18N[currentLang][`track_${t}`] || `${t} 트랙`;
+    })(),
+    'genre': translateOptions(getCellValue(cells, COLUMNS.genre)),
+    'branch': getCellValue(cells, COLUMNS.branch),
+    'goal': getCellValue(cells, COLUMNS.goal),
+    // 'level'은 자동 계산으로 처리 (시트 O열 무시)
+    'strength': translateOptions(getCellValue(cells, COLUMNS.strength)),
+    'weakness': translateOptions(getCellValue(cells, COLUMNS.weakness)),
+    'comment': getCellValue(cells, COLUMNS.comment),
+    'class': translateOptions(getCellValue(cells, COLUMNS.rec_class)),
+    'rec_trainer': getCellValue(cells, COLUMNS.rec_trainer),
+    'focus': translateOptions(getCellValue(cells, COLUMNS.focus)),
+    'schedule': translateOptions(getCellValue(cells, COLUMNS.schedule))
+  };
+  
+  Object.entries(textFields).forEach(([key, val]) => {
+    document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
+      el.textContent = val;
+    });
+  });
+  
+  // 코멘트 길이에 따라 자동 폰트 조절
+  const commentText = textFields['comment'] || '';
+  const commentLen = commentText.length;
+  document.querySelectorAll('.comment-line').forEach(el => {
+    if (commentLen > 150) {
+      el.style.fontSize = '11px';
+      el.style.lineHeight = '1.5';
+      el.style.padding = '9px 13px';
+      document.querySelectorAll('.report').forEach(r => r.classList.add('long-comment'));
+    } else if (commentLen > 80) {
+      el.style.fontSize = '11.5px';
+      el.style.lineHeight = '1.55';
+    } else {
+      el.style.fontSize = '12.5px';
+      el.style.lineHeight = '1.6';
+    }
+  });
+  
+  // === 강점/보완필요 박스 데이터 길이별 자동 폰트 조절 ===
+  const strengthText = textFields['strength'] || '';
+  const weaknessText = textFields['weakness'] || '';
+  const maxSummaryLen = Math.max(strengthText.length, weaknessText.length);
+  
+  document.querySelectorAll('.summary-card .val').forEach(el => {
+    if (maxSummaryLen > 40) {
+      el.style.fontSize = '11px';
+      el.style.lineHeight = '1.4';
+    } else if (maxSummaryLen > 25) {
+      el.style.fontSize = '12px';
+      el.style.lineHeight = '1.45';
+    } else {
+      el.style.fontSize = '13px';
+      el.style.lineHeight = '1.5';
+    }
+  });
+  
+  // === 처방 박스 (CLASS/FOCUS) 데이터 길이별 자동 폰트 조절 ===
+  const classText = textFields['class'] || '';
+  const focusText = textFields['focus'] || '';
+  const scheduleText = textFields['schedule'] || '';
+  const recTrainerText = textFields['rec_trainer'] || '';
+  const maxPrescLen = Math.max(classText.length, focusText.length, scheduleText.length, recTrainerText.length);
+  
+  document.querySelectorAll('.prescription .item .val').forEach(el => {
+    if (maxPrescLen > 35) {
+      el.style.fontSize = '10.5px';
+      el.style.lineHeight = '1.35';
+    } else if (maxPrescLen > 20) {
+      el.style.fontSize = '11.5px';
+      el.style.lineHeight = '1.4';
+    } else {
+      el.style.fontSize = '12px';
+      el.style.lineHeight = '1.4';
+    }
+  });
+  
+  // === 전체 콘텐츠 길이 측정해서 매우 길면 추가 압축 ===
+  const totalLen = strengthText.length + weaknessText.length + classText.length + focusText.length + commentText.length;
+  document.querySelectorAll('.report').forEach(r => {
+    r.classList.remove('content-medium', 'content-long', 'content-very-long');
+    if (totalLen > 180) {
+      r.classList.add('content-very-long');
+    } else if (totalLen > 100) {
+      r.classList.add('content-long');
+    } else if (totalLen > 50) {
+      r.classList.add('content-medium');
+    }
+  });
+  
+  // 점수
+  const scores = [
+    Number(getCellValue(cells, COLUMNS.score_rhythm)) || 0,
+    Number(getCellValue(cells, COLUMNS.score_iso)) || 0,
+    Number(getCellValue(cells, COLUMNS.score_expr)) || 0,
+    Number(getCellValue(cells, COLUMNS.score_learn)) || 0,
+    Number(getCellValue(cells, COLUMNS.score_potential)) || 0
+  ];
+  
+  scores.forEach((s, i) => {
+    // 10점 만점 표기 (소수점 1자리, 8.0 표시)
+    const displayScore = s.toFixed(1);
+    document.querySelectorAll(`[data-score="${i}"]`).forEach(el => el.textContent = displayScore);
+    // 바 채우기: 점수 × 10 = %
+    document.querySelectorAll(`[data-bar="${i}"]`).forEach(el => el.style.width = (s * 10) + '%');
+    // 등급 뱃지 갱신
+    const g = getGrade(s);
+    document.querySelectorAll(`[data-grade="${i}"]`).forEach(el => {
+      el.textContent = g.label;
+      el.className = `grade ${g.cls}`;
+    });
+  });
+  
+  const avgNum = scores.reduce((a,b) => a+b, 0) / 5;
+  const avg = avgNum.toFixed(1);
+  document.querySelectorAll('[data-field="avg"]').forEach(el => el.textContent = avg);
+  // 평균 등급 뱃지 갱신
+  const ag = getGrade(avgNum);
+  document.querySelectorAll('[data-avg-grade]').forEach(el => {
+    el.textContent = ag.label;
+    el.className = `grade-big ${ag.cls}`;
+  });
+  // 현재 수준 자동 계산: 평균 X점 · 상위 Y% · 등급
+  const percentile = getPercentile(avgNum);
+  const levelText = I18N[currentLang].level_format(avg, percentile, ag.label);
+  document.querySelectorAll('[data-field="level"]').forEach(el => el.textContent = levelText);
+  
+  // 차트 업데이트
+  updateChart('radar-a4', scores);
+  updateChart('radar-mobile', scores);
+}
+
+function show(type) {
+  document.getElementById('report-a4').classList.toggle('hidden', type !== 'a4');
+  document.getElementById('report-mobile').classList.toggle('hidden', type !== 'mobile');
+  document.getElementById('btn-a4').classList.toggle('active', type === 'a4');
+  document.getElementById('btn-mobile').classList.toggle('active', type === 'mobile');
+}
+
+// 샘플 데이터 적용 함수
+function applySampleData() {
+  // 샘플의 옵션 필드를 현재 언어에 맞게 번역
+  const sampleData = {
+    'strength': '잠재력 우수, 리듬감 우수',
+    'weakness': '아이솔레이션 강화',
+    'class': '입시 전문반, 코레오 중급',
+    'focus': '아이솔레이션 강화, 표현력 보강',
+    'grade': '고등학교 2학년',
+    'genre': '코레오, 힙합',
+    'schedule': '주 3회'
+  };
+  Object.entries(sampleData).forEach(([key, val]) => {
+    document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
+      el.textContent = translateOptions(val);
+    });
+  });
+  
+  const sampleScores = [8.5, 7.0, 7.5, 8.0, 9.0];
+  updateChart('radar-a4', sampleScores);
+  updateChart('radar-mobile', sampleScores);
+  
+  sampleScores.forEach((s, i) => {
+    const g = getGrade(s);
+    document.querySelectorAll(`[data-grade="${i}"]`).forEach(el => {
+      el.textContent = g.label;
+      el.className = `grade ${g.cls}`;
+    });
+  });
+  const sampleAvgNum = sampleScores.reduce((a,b) => a+b, 0) / 5;
+  const sampleAvg = sampleAvgNum.toFixed(1);
+  document.querySelectorAll('[data-field="avg"]').forEach(el => el.textContent = sampleAvg);
+  const sampleAg = getGrade(sampleAvgNum);
+  document.querySelectorAll('[data-avg-grade]').forEach(el => {
+    el.textContent = sampleAg.label;
+    el.className = `grade-big ${sampleAg.cls}`;
+  });
+  const sampleLevel = I18N[currentLang].level_format(sampleAvg, getPercentile(sampleAvgNum), sampleAg.label);
+  document.querySelectorAll('[data-field="level"]').forEach(el => el.textContent = sampleLevel);
+}
+
+applySampleData();
+
+// URL에서 언어 파라미터 적용
+const urlLang = getLangFromURL();
+if (urlLang !== 'kr') {
+  setLang(urlLang);
+}
+
+// 시트 로드
+loadFromSheet();
+</script>
+
+</body>
+</html>
