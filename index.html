@@ -334,26 +334,28 @@ body {
     <div class="chart-wrap">
       <svg class="radar" id="radar-a4" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
         <g fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1">
-          <polygon points="150,30 264.85,113.43 221,247.57 79,247.57 35.15,113.43"/>
-          <polygon points="150,60 234.64,121.57 201.75,222.18 98.25,222.18 65.36,121.57"/>
-          <polygon points="150,90 204.43,129.72 182.5,196.79 117.5,196.79 95.57,129.72"/>
-          <polygon points="150,120 174.21,137.86 163.25,171.39 136.75,171.39 125.79,137.86"/>
+          <polygon points="90.00,46.08 210.00,46.08 270.00,150.00 210.00,253.92 90.00,253.92 30.00,150.00"/>
+          <polygon points="105.00,72.06 195.00,72.06 240.00,150.00 195.00,227.94 105.00,227.94 60.00,150.00"/>
+          <polygon points="120.00,98.04 180.00,98.04 210.00,150.00 180.00,201.96 120.00,201.96 90.00,150.00"/>
+          <polygon points="135.00,124.02 165.00,124.02 180.00,150.00 165.00,175.98 135.00,175.98 120.00,150.00"/>
         </g>
         <g stroke="rgba(14,27,58,0.15)" stroke-width="1">
-          <line x1="150" y1="150" x2="150" y2="30"/>
-          <line x1="150" y1="150" x2="264.85" y2="113.43"/>
-          <line x1="150" y1="150" x2="221" y2="247.57"/>
-          <line x1="150" y1="150" x2="79" y2="247.57"/>
-          <line x1="150" y1="150" x2="35.15" y2="113.43"/>
+          <line x1="150" y1="150" x2="90.00" y2="46.08"/>
+          <line x1="150" y1="150" x2="210.00" y2="46.08"/>
+          <line x1="150" y1="150" x2="270.00" y2="150.00"/>
+          <line x1="150" y1="150" x2="210.00" y2="253.92"/>
+          <line x1="150" y1="150" x2="90.00" y2="253.92"/>
+          <line x1="150" y1="150" x2="30.00" y2="150.00"/>
         </g>
         <polygon class="data-area" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="2.5"/>
         <g class="data-points" fill="#C8302E"></g>
         <g font-family="Pretendard, sans-serif" font-weight="700" font-size="12" fill="#0E1B3A">
-          <text x="150" y="18" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
-          <text x="295" y="115" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
-          <text x="240" y="275" text-anchor="middle" data-i18n="score_expr">표현력</text>
-          <text x="60" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
-          <text x="5" y="115" text-anchor="middle" data-i18n="score_potential">잠재력</text>
+          <text x="80" y="30" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
+          <text x="220" y="30" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
+          <text x="292" y="154" text-anchor="start" data-i18n="score_expr">표현력</text>
+          <text x="220" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
+          <text x="80" y="275" text-anchor="middle" data-i18n="score_potential">잠재력</text>
+          <text x="8" y="154" text-anchor="end" data-i18n="score_angle">앵글</text>
         </g>
       </svg>
     </div>
@@ -364,8 +366,9 @@ body {
       <div class="score-row"><span class="name" data-i18n="score_expr">표현력</span><div class="bar"><div class="fill" data-bar="2"></div></div><span class="num" data-score="2">7.5</span><span class="grade grade-3" data-grade="2">양호</span></div>
       <div class="score-row"><span class="name" data-i18n="score_learn">습득력</span><div class="bar"><div class="fill" data-bar="3"></div></div><span class="num" data-score="3">8.0</span><span class="grade grade-4" data-grade="3">우수</span></div>
       <div class="score-row"><span class="name" data-i18n="score_potential">잠재력</span><div class="bar"><div class="fill" data-bar="4"></div></div><span class="num" data-score="4">9.0</span><span class="grade grade-4" data-grade="4">우수</span></div>
+      <div class="score-row"><span class="name" data-i18n="score_angle">앵글</span><div class="bar"><div class="fill" data-bar="5"></div></div><span class="num" data-score="5">8.0</span><span class="grade grade-4" data-grade="5">우수</span></div>
       <div class="score-avg">
-        <span class="lab" data-i18n="avg_label">5개 항목 평균</span>
+        <span class="lab" data-i18n="avg_label">6개 항목 평균</span>
         <div>
           <span class="val" data-field="avg">8.0</span>
           <span class="grade-big grade-4" data-avg-grade>우수</span>
@@ -464,26 +467,28 @@ body {
     <div class="chart-wrap">
       <svg class="radar" id="radar-mobile" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
       <g fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1">
-        <polygon points="150,30 264.85,113.43 221,247.57 79,247.57 35.15,113.43"/>
-        <polygon points="150,60 234.64,121.57 201.75,222.18 98.25,222.18 65.36,121.57"/>
-        <polygon points="150,90 204.43,129.72 182.5,196.79 117.5,196.79 95.57,129.72"/>
-        <polygon points="150,120 174.21,137.86 163.25,171.39 136.75,171.39 125.79,137.86"/>
+        <polygon points="90.00,46.08 210.00,46.08 270.00,150.00 210.00,253.92 90.00,253.92 30.00,150.00"/>
+        <polygon points="105.00,72.06 195.00,72.06 240.00,150.00 195.00,227.94 105.00,227.94 60.00,150.00"/>
+        <polygon points="120.00,98.04 180.00,98.04 210.00,150.00 180.00,201.96 120.00,201.96 90.00,150.00"/>
+        <polygon points="135.00,124.02 165.00,124.02 180.00,150.00 165.00,175.98 135.00,175.98 120.00,150.00"/>
       </g>
       <g stroke="rgba(14,27,58,0.15)" stroke-width="1">
-        <line x1="150" y1="150" x2="150" y2="30"/>
-        <line x1="150" y1="150" x2="264.85" y2="113.43"/>
-        <line x1="150" y1="150" x2="221" y2="247.57"/>
-        <line x1="150" y1="150" x2="79" y2="247.57"/>
-        <line x1="150" y1="150" x2="35.15" y2="113.43"/>
+        <line x1="150" y1="150" x2="90.00" y2="46.08"/>
+        <line x1="150" y1="150" x2="210.00" y2="46.08"/>
+        <line x1="150" y1="150" x2="270.00" y2="150.00"/>
+        <line x1="150" y1="150" x2="210.00" y2="253.92"/>
+        <line x1="150" y1="150" x2="90.00" y2="253.92"/>
+        <line x1="150" y1="150" x2="30.00" y2="150.00"/>
       </g>
       <polygon class="data-area" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="2.5"/>
       <g class="data-points" fill="#C8302E"></g>
       <g font-family="Pretendard, sans-serif" font-weight="700" font-size="13" fill="#0E1B3A">
-        <text x="150" y="18" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
-        <text x="295" y="115" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
-        <text x="240" y="275" text-anchor="middle" data-i18n="score_expr">표현력</text>
-        <text x="60" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
-        <text x="5" y="115" text-anchor="middle" data-i18n="score_potential">잠재력</text>
+        <text x="80" y="30" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
+        <text x="220" y="30" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
+        <text x="296" y="154" text-anchor="start" data-i18n="score_expr">표현력</text>
+        <text x="220" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
+        <text x="80" y="275" text-anchor="middle" data-i18n="score_potential">잠재력</text>
+        <text x="4" y="154" text-anchor="end" data-i18n="score_angle">앵글</text>
       </g>
     </svg>
   </div>
@@ -494,8 +499,9 @@ body {
     <div class="score-row"><span class="name" data-i18n="score_expr">표현력</span><div class="bar"><div class="fill" data-bar="2"></div></div><span class="num" data-score="2">7.5</span><span class="grade grade-3" data-grade="2">양호</span></div>
     <div class="score-row"><span class="name" data-i18n="score_learn">습득력</span><div class="bar"><div class="fill" data-bar="3"></div></div><span class="num" data-score="3">8.0</span><span class="grade grade-4" data-grade="3">우수</span></div>
     <div class="score-row"><span class="name" data-i18n="score_potential">잠재력</span><div class="bar"><div class="fill" data-bar="4"></div></div><span class="num" data-score="4">9.0</span><span class="grade grade-4" data-grade="4">우수</span></div>
+    <div class="score-row"><span class="name" data-i18n="score_angle">앵글</span><div class="bar"><div class="fill" data-bar="5"></div></div><span class="num" data-score="5">8.0</span><span class="grade grade-4" data-grade="5">우수</span></div>
     <div class="score-avg">
-      <span class="lab" data-i18n="avg_label">5개 항목 평균</span>
+      <span class="lab" data-i18n="avg_label">6개 항목 평균</span>
       <div>
         <span class="val" data-field="avg">8.0</span>
         <span class="grade-big grade-4" data-avg-grade>우수</span>
@@ -567,7 +573,8 @@ const COLUMNS = {
   score_expr: 11,   // L: 표현력 (0~10)
   score_learn: 12,  // M: 습득력 (0~10)
   score_potential: 13, // N: 잠재력 (0~10)
-  level: 14,        // O: (자동계산, 시트 입력 불필요) 또는 강사 메모용
+  score_angle: 14,  // O: 앵글 (0~10) ※ 기존 강사메모(level)란을 앵글 점수로 전환
+  level: 14,        // O: (자동계산으로 표시되므로 시트 O열은 읽지 않음 → 앵글과 열 공유 무방)
   strength: 15,     // P: 강점
   weakness: 16,     // Q: 보완 필요
   comment: 17,      // R: 한줄 코멘트
@@ -649,8 +656,9 @@ function getGrade(score) {
 }
 
 function calcRadarPoints(scores) {
-  // 5각형 정점의 각도 (위쪽부터 시계방향)
-  const angles = [-90, -18, 54, 126, 198]; // degrees
+  // 6각형 정점의 각도 (윗변이 평평한 형태, 항목 순서대로)
+  // 리듬(좌상) → 아이솔(우상) → 표현(우) → 습득(우하) → 잠재(좌하) → 앵글(좌)
+  const angles = [-120, -60, 0, 60, 120, 180]; // degrees
   const center = 150;
   const maxRadius = 120; // 점수 10점 만점 = 반지름 120
   
@@ -703,7 +711,8 @@ const I18N = {
     score_expr: '표현력',
     score_learn: '습득력',
     score_potential: '잠재력',
-    avg_label: '5개 항목 평균',
+    score_angle: '앵글',
+    avg_label: '6개 항목 평균',
     avg_label_short: '평균',
     grade_basic: '기초 (0~3.5)',
     grade_growing: '발전 (4~5.5)',
@@ -837,6 +846,7 @@ const I18N = {
     score_expr: 'Expression',
     score_learn: 'Learning',
     score_potential: 'Potential',
+    score_angle: 'Angle',
     avg_label: 'Overall Average',
     avg_label_short: 'Average',
     grade_basic: 'Basic (0-3.5)',
@@ -967,7 +977,8 @@ const I18N = {
     score_expr: '表現力',
     score_learn: '習得力',
     score_potential: 'ポテンシャル',
-    avg_label: '5項目平均',
+    score_angle: 'アングル',
+    avg_label: '6項目平均',
     avg_label_short: '平均',
     grade_basic: '基礎 (0~3.5)',
     grade_growing: '発展 (4~5.5)',
@@ -1097,7 +1108,8 @@ const I18N = {
     score_expr: '表现力',
     score_learn: '学习力',
     score_potential: '潜力',
-    avg_label: '5项平均',
+    score_angle: '角度',
+    avg_label: '6项平均',
     avg_label_short: '平均',
     grade_basic: '基础 (0~3.5)',
     grade_growing: '成长 (4~5.5)',
@@ -1590,7 +1602,8 @@ function applyData(cells) {
     Number(getCellValue(cells, COLUMNS.score_iso)) || 0,
     Number(getCellValue(cells, COLUMNS.score_expr)) || 0,
     Number(getCellValue(cells, COLUMNS.score_learn)) || 0,
-    Number(getCellValue(cells, COLUMNS.score_potential)) || 0
+    Number(getCellValue(cells, COLUMNS.score_potential)) || 0,
+    Number(getCellValue(cells, COLUMNS.score_angle)) || 0
   ];
   
   scores.forEach((s, i) => {
@@ -1607,7 +1620,7 @@ function applyData(cells) {
     });
   });
   
-  const avgNum = scores.reduce((a,b) => a+b, 0) / 5;
+  const avgNum = scores.reduce((a,b) => a+b, 0) / scores.length;
   const avg = avgNum.toFixed(1);
   document.querySelectorAll('[data-field="avg"]').forEach(el => el.textContent = avg);
   // 평균 등급 뱃지 갱신
@@ -1651,7 +1664,7 @@ function applySampleData() {
     });
   });
   
-  const sampleScores = [8.5, 7.0, 7.5, 8.0, 9.0];
+  const sampleScores = [8.5, 7.0, 7.5, 8.0, 9.0, 8.0];
   updateChart('radar-a4', sampleScores);
   updateChart('radar-mobile', sampleScores);
   
@@ -1662,7 +1675,7 @@ function applySampleData() {
       el.className = `grade ${g.cls}`;
     });
   });
-  const sampleAvgNum = sampleScores.reduce((a,b) => a+b, 0) / 5;
+  const sampleAvgNum = sampleScores.reduce((a,b) => a+b, 0) / sampleScores.length;
   const sampleAvg = sampleAvgNum.toFixed(1);
   document.querySelectorAll('[data-field="avg"]').forEach(el => el.textContent = sampleAvg);
   const sampleAg = getGrade(sampleAvgNum);
