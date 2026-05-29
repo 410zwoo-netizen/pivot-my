@@ -68,21 +68,19 @@ body {
   padding: 28px 36px 22px;
 }
 
-/* === 모바일 세로 긴 === */
-.report.mobile {
-  width: 540px; margin: 0 auto;
-  background: #FFFFFF; color: #0E1B3A;
-  position: relative; overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  padding: 28px 24px 24px;
-  font-size: 13px;
+/* === A4 간소화 버전 (처방 제외) === */
+/* 처방 섹션이 빠져 세로 여유가 생기므로, 콘텐츠 블록들을 위→아래로 고르게 분산 배치하고
+   푸터는 자동으로 페이지 바닥에 정렬되도록 space-between 사용 */
+.report.a4.simple {
+  justify-content: space-between;
 }
-.report.mobile .header img { height: 32px; }
-.report.mobile .title-row h2 { font-size: 24px; }
-.report.mobile .student-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; }
-.report.mobile .chart-section { flex-direction: column; gap: 14px; }
-.report.mobile .chart-wrap, .report.mobile .scores { width: 100%; }
-.report.mobile svg.radar { width: 290px; height: 290px; }
+/* 세로 여유를 활용해 차트를 키워 빈 느낌을 줄이고 시각적 무게중심을 확보 */
+.report.a4.simple .chart-section { margin: 10px 0; }
+.report.a4.simple .chart-wrap svg.radar { width: 330px; height: 330px; }
+/* 코멘트가 푸터와 너무 붙지 않도록 약간의 하단 간격 */
+.report.a4.simple .comment-line { margin-bottom: 6px; }
+/* 간소화 버전 푸터는 space-between이 바닥 정렬을 담당 (auto 마진 불필요) */
+.report.a4.simple .footer-multi { margin-top: 0; }
 
 .header { 
   display: flex; justify-content: space-between; align-items: flex-start;
@@ -230,18 +228,6 @@ body {
   font-size: 9px; color: rgba(14,27,58,0.55);
   white-space: nowrap;
 }
-.report.mobile .footer-branches {
-  grid-template-columns: 1fr 1fr; gap: 12px; padding: 0;
-}
-.report.mobile .footer-branch .b-name {
-  font-size: 9px; white-space: normal;
-}
-.report.mobile .footer-branch .b-name .b-sns {
-  font-size: 8.5px; display: block; margin-top: 2px;
-}
-.report.mobile .footer-branch .b-addr { 
-  font-size: 8px; white-space: normal;
-}
 
 /* === 콘텐츠 길이별 자동 압축 모드 === */
 .report.content-medium .section-label { margin: 6px 0 5px; }
@@ -280,13 +266,13 @@ body {
   position: absolute; right: -90px; bottom: 90px;
   width: 360px; height: 360px; opacity: 0.04; pointer-events: none;
 }
-.report.mobile .watermark { width: 280px; height: 280px; right: -60px; bottom: 100px; }
+.report.mobile .watermark { width: 280px; height: 280px; right: -60px; bottom: 100px; } /* (구) 미사용 */
 
 @media print {
   body { background: white; padding: 0; }
   .toggle-bar { display: none; }
   .report { box-shadow: none; }
-  .report.mobile { display: none; }
+  .report.hidden { display: none !important; }
   @page { size: A4; margin: 0; }
 }
 .hidden { display: none !important; }
@@ -296,8 +282,8 @@ body {
 
 <div class="toggle-bar">
   <strong style="color: #D4AF37;">📋 PIVOT 진단서</strong>
-  <button id="btn-a4" class="active" onclick="show('a4')">A4 인쇄용</button>
-  <button id="btn-mobile" onclick="show('mobile')">모바일 PDF</button>
+  <button id="btn-a4" class="active" onclick="show('a4')">A4 (처방 포함)</button>
+  <button id="btn-mobile" onclick="show('mobile')">A4 (처방 제외)</button>
   <span class="lang-section">
     <span class="lang-label">LANG</span>
     <button class="lang-btn active" data-lang="kr" onclick="setLang('kr')">🇰🇷 KR</button>
@@ -441,7 +427,7 @@ body {
 </div>
 
 <!-- 모바일 세로 긴 -->
-<div class="report mobile hidden" id="report-mobile">
+<div class="report a4 simple hidden" id="report-mobile">
   <svg class="watermark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <path d="M 20 30 L 180 30 L 100 175 Z" fill="none" stroke="#0E1B3A" stroke-width="2"/>
   </svg>
@@ -474,8 +460,9 @@ body {
 
   <p class="section-label"><span data-i18n="section_diagnosis">진단 결과 · DIAGNOSIS</span></p>
 
-  <div class="chart-wrap">
-    <svg class="radar" id="radar-mobile" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
+  <div class="chart-section">
+    <div class="chart-wrap">
+      <svg class="radar" id="radar-mobile" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
       <g fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1">
         <polygon points="150,30 264.85,113.43 221,247.57 79,247.57 35.15,113.43"/>
         <polygon points="150,60 234.64,121.57 201.75,222.18 98.25,222.18 65.36,121.57"/>
@@ -501,7 +488,7 @@ body {
     </svg>
   </div>
 
-  <div class="scores" style="margin-top: 10px;">
+  <div class="scores">
     <div class="score-row"><span class="name" data-i18n="score_rhythm">리듬 & 그루브</span><div class="bar"><div class="fill" data-bar="0"></div></div><span class="num" data-score="0">8.5</span><span class="grade grade-4" data-grade="0">우수</span></div>
     <div class="score-row"><span class="name" data-i18n="score_iso">아이솔레이션</span><div class="bar"><div class="fill" data-bar="1"></div></div><span class="num" data-score="1">7.0</span><span class="grade grade-3" data-grade="1">양호</span></div>
     <div class="score-row"><span class="name" data-i18n="score_expr">표현력</span><div class="bar"><div class="fill" data-bar="2"></div></div><span class="num" data-score="2">7.5</span><span class="grade grade-3" data-grade="2">양호</span></div>
@@ -514,6 +501,7 @@ body {
         <span class="grade-big grade-4" data-avg-grade>우수</span>
       </div>
     </div>
+  </div>
   </div>
 
   <div class="grade-legend">
@@ -537,22 +525,7 @@ body {
     타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.
   </div>
 
-  <p class="section-label"><span data-i18n="section_prescription">맞춤 처방 · PRESCRIPTION</span></p>
-
-  <div class="prescription">
-    <div class="head">
-      <span class="lab" data-i18n="prescription_label">PIVOT 맞춤 커리큘럼</span>
-      <span class="stamp" data-field="stamp">No. 2026-001</span>
-    </div>
-    <div class="items">
-      <div class="item"><p class="lab">CLASS</p><p class="val" data-field="class">입시 전문반</p></div>
-      <div class="item"><p class="lab">TRAINER</p><p class="val" data-field="rec_trainer">XXX · YYY</p></div>
-      <div class="item"><p class="lab">FOCUS</p><p class="val" data-field="focus">아이솔레이션 강화</p></div>
-      <div class="item"><p class="lab">SCHEDULE</p><p class="val" data-field="schedule">주 3회</p></div>
-    </div>
-  </div>
-
-  <div class="footer-multi" style="margin-top: 24px;">
+  <div class="footer-multi">
     <div class="footer-brand">PIVOT STUDIO</div>
     <div class="footer-divider"></div>
     <div class="footer-branches">
