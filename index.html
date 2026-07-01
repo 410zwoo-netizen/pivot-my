@@ -357,7 +357,6 @@ body {
     <button class="lang-btn" data-lang="jp" onclick="setLang('jp')">🇯🇵 JP</button>
     <button class="lang-btn" data-lang="cn" onclick="setLang('cn')">🇨🇳 CN</button>
   </span>
-  <button onclick="runDiagnose()" style="background:#C8302E;color:#fff;border:none;padding:6px 12px;border-radius:4px;font-weight:700;font-size:11px;cursor:pointer;margin-left:8px;">🔍 진단</button>
   <span class="status" id="data-status">샘플 데이터</span>
   <span class="info">Ctrl/Cmd + P로 PDF 저장</span>
 </div>
@@ -1380,87 +1379,6 @@ function showDebugBox(message, type) {
 }
 
 
-// === 디버그 진단 함수 ===
-async function runDiagnose() {
-  const cells = window.__lastCells;
-  if (!cells) {
-    alert('시트 데이터가 아직 로드 안 됨. id 파라미터 확인하세요.');
-    return;
-  }
-  
-  // 디버그할 컬럼들 (P, Q, S, U, V)
-  const debugCols = [
-    { idx: 15, name: 'P열(강점)' },
-    { idx: 16, name: 'Q열(보완필요)' },
-    { idx: 18, name: 'S열(추천클래스)' },
-    { idx: 20, name: 'U열(집중영역)' },
-    { idx: 21, name: 'V열(주간일정)' },
-    { idx: 4, name: 'E열(학년)' },
-    { idx: 6, name: 'G열(장르)' }
-  ];
-  
-  let output = '🔍 시트 데이터 진단 결과\n\n현재 언어: ' + currentLang + '\n\n';
-  
-  for (const col of debugCols) {
-    const cell = cells[col.idx];
-    if (!cell || !cell.v) {
-      output += '【' + col.name + '】 (비어있음)\n\n';
-      continue;
-    }
-    
-    const raw = String(cell.v);
-    output += '【' + col.name + '】\n';
-    output += '원본: "' + raw + '"\n';
-    output += '길이: ' + raw.length + '자\n';
-    
-    // 보이지 않는 특수 문자 찾기
-    const hidden = [];
-    for (let i = 0; i < raw.length; i++) {
-      const code = raw.charCodeAt(i);
-      // ASCII 인쇄 가능 범위 밖 + 한글/일반 문자 아닌 것
-      if (code === 0x00A0) hidden.push({pos: i, name: 'NBSP(non-breaking space)', code: '0xA0'});
-      else if (code === 0x200B) hidden.push({pos: i, name: 'Zero-Width Space', code: '0x200B'});
-      else if (code === 0x200C) hidden.push({pos: i, name: 'Zero-Width Non-Joiner', code: '0x200C'});
-      else if (code === 0x200D) hidden.push({pos: i, name: 'Zero-Width Joiner', code: '0x200D'});
-      else if (code === 0xFEFF) hidden.push({pos: i, name: 'BOM', code: '0xFEFF'});
-      else if (code === 0x2060) hidden.push({pos: i, name: 'Word Joiner', code: '0x2060'});
-      else if (code === 0x3000) hidden.push({pos: i, name: '전각 공백', code: '0x3000'});
-      else if (code === 0x0009) hidden.push({pos: i, name: '탭', code: '0x09'});
-      else if (code >= 0x2000 && code <= 0x200A) hidden.push({pos: i, name: '특수 공백', code: '0x' + code.toString(16)});
-    }
-    
-    if (hidden.length > 0) {
-      output += '⚠️ 보이지 않는 특수 문자 ' + hidden.length + '개 발견:\n';
-      hidden.forEach(h => {
-        output += '  - 위치 ' + h.pos + ': ' + h.name + ' (' + h.code + ')\n';
-      });
-    } else {
-      output += '✓ 보이지 않는 특수 문자 없음\n';
-    }
-    
-    // 옵션별 매칭 테스트
-    const parts = raw.split(/[,·\/\n]/).map(s => s.trim()).filter(s => s);
-    output += '분리된 옵션 ' + parts.length + '개:\n';
-    parts.forEach(part => {
-      const key = textToKey(part);
-      const enVal = I18N.en[key];
-      const matched = enVal ? '✓ ' + enVal : '✗ 매칭 실패';
-      output += '  - "' + part + '" → ' + key + ' → ' + matched + '\n';
-    });
-    
-    output += '\n';
-  }
-  
-  // 큰 모달로 표시
-  let modal = document.getElementById('diagnose-modal');
-  if (modal) modal.remove();
-  
-  modal = document.createElement('div');
-  modal.id = 'diagnose-modal';
-  modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;padding:40px;overflow:auto;';
-  modal.innerHTML = '<div style="background:#0E1B3A;color:#fff;padding:30px;border-radius:8px;max-width:800px;margin:0 auto;font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.6;"><div style="display:flex;justify-content:space-between;margin-bottom:20px;"><strong style="color:#D4AF37;font-size:18px;">진단 결과</strong><button onclick="document.getElementById(\'diagnose-modal\').remove()" style="background:#C8302E;color:#fff;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;">닫기</button></div>' + output.replace(/\n/g, '<br>') + '<div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(212,175,55,0.3);"><button onclick="navigator.clipboard.writeText(this.parentElement.parentElement.innerText);alert(\'복사됨\')" style="background:#D4AF37;color:#0E1B3A;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-weight:700;">📋 결과 복사 (스크린샷 대신)</button></div></div>';
-  document.body.appendChild(modal);
-}
 
 // ===== 시트 통신 (gviz) =====
 function sheetUrl(tab) {
