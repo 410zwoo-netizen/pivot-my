@@ -118,6 +118,33 @@ body {
 .sv-hint { margin-top: 14px; font-size: 12px; color: rgba(14,27,58,0.55); text-align: center; }
 #btn-back { background: #D4AF37; color: #0E1B3A; font-weight: 700; }
 
+/* === 전체 학생 대시보드 === */
+#dashboard-view {
+  width: 794px; max-width: 94vw; margin: 0 auto; padding: 28px 32px;
+  background: #FFFFFF; color: #0E1B3A; border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.dv-search {
+  padding: 9px 14px; border: 1px solid rgba(14,27,58,0.2); border-radius: 6px;
+  font-size: 14px; font-family: inherit; width: 220px; max-width: 45vw;
+}
+.dv-search:focus { outline: none; border-color: #D4AF37; }
+#student-list { display: flex; flex-direction: column; gap: 8px; }
+.stu-item {
+  display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 14px;
+  width: 100%; text-align: left; padding: 14px 18px; cursor: pointer;
+  background: #FAF8F0; border: 1px solid rgba(14,27,58,0.08); border-left: 4px solid #0E1B3A;
+  border-radius: 0 6px 6px 0; font-family: inherit;
+}
+.stu-item:hover { background: #F3EFE0; }
+.stu-name { font-size: 16px; font-weight: 800; }
+.stu-meta { font-size: 12px; color: rgba(14,27,58,0.6); font-weight: 600; }
+.stu-date { font-size: 12px; color: rgba(14,27,58,0.45); }
+.sv-back {
+  background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 6px;
+  font-size: 12px; font-weight: 700; color: #D4AF37; font-family: inherit;
+}
+
 .header { 
   display: flex; justify-content: space-between; align-items: flex-start;
   padding-bottom: 14px; border-bottom: 2px solid #0E1B3A;
@@ -335,11 +362,24 @@ body {
   <span class="info">Ctrl/Cmd + P로 PDF 저장</span>
 </div>
 
-<!-- 학생 이력 목록 (강사용 · ?student=학생ID 로 접속) -->
+<!-- 전체 학생 대시보드 (강사용 · 배포주소 기본 화면) -->
+<div id="dashboard-view" class="hidden">
+  <div class="sv-head">
+    <div>
+      <p class="sv-label">PIVOT 진단 관리</p>
+      <h2 id="dv-count">학생 목록</h2>
+    </div>
+    <input id="dv-search" class="dv-search" type="text" placeholder="🔍 이름 검색" oninput="renderDashboard()">
+  </div>
+  <div id="student-list"></div>
+  <p class="sv-hint">학생을 클릭하면 진단 이력이 열립니다.</p>
+</div>
+
+<!-- 학생 이력 목록 (강사용) -->
 <div id="student-view" class="hidden">
   <div class="sv-head">
     <div>
-      <p class="sv-label">학생 진단 이력</p>
+      <button class="sv-back" onclick="backToDashboard()">← 전체 학생</button>
       <h2 id="sv-name">학생</h2>
     </div>
     <div class="sv-filters">
@@ -349,7 +389,7 @@ body {
     </div>
   </div>
   <div id="history-list"></div>
-  <p class="sv-hint">항목을 클릭하면 진단서가 열립니다. 상단 "← 목록"으로 언제든 돌아올 수 있어요.</p>
+  <p class="sv-hint">항목을 클릭하면 진단서가 열립니다. 상단 "← 목록"으로 이력으로 돌아올 수 있어요.</p>
 </div>
 
 <!-- A4 -->
@@ -1437,19 +1477,24 @@ async function fetchTab(tab) {
 }
 
 // ===== 라우팅 =====
-// ?student=학생ID                         → 그 학생의 보컬·댄스 이력 목록
 // ?id=진단번호 (&discipline=dance|vocal)  → 단건 리포트 (학생에게 보낼 링크)
-// 파라미터 없음                            → 샘플 데이터
+// ?student=학생키                          → 그 학생의 이력 목록
+// 파라미터 없음                            → 전체 학생 대시보드 (강사용 첫 화면)
 async function loadFromSheet() {
   const params = new URLSearchParams(window.location.search);
-  const studentId = params.get('student');
   const id = params.get('id');
+  const studentId = params.get('student');
   const statusEl = document.getElementById('data-status');
 
-  if (studentId) return loadStudent(studentId, statusEl);
+  // 단건 리포트 링크는 시트 전체를 읽을 필요 없음
   if (id) return loadSingle(params.get('discipline') || 'dance', id, statusEl);
 
-  if (statusEl) statusEl.textContent = '샘플 데이터 (?student=학생ID 또는 ?id=진단번호 로 시트 연동)';
+  // 나머지는 두 탭 전체를 읽어 대시보드/학생 화면 구성
+  await loadAllRecords(statusEl);
+  if (!window.__allRecords) return; // 로드 실패 시 중단(메시지 표시됨)
+
+  if (studentId) return openStudent(studentId);
+  showDashboard();
 }
 
 // 단건 리포트 로드
@@ -1476,42 +1521,93 @@ async function loadSingle(discipline, id, statusEl) {
   }
 }
 
-// 학생 이력: 두 탭에서 학생ID 일치 행을 모아 목록 표시
-async function loadStudent(studentId, statusEl) {
+// 두 탭 전체 레코드 로드 → window.__allRecords
+// 학생 묶음 기준(groupKey): 학생ID(A열)가 있으면 그것, 없으면 이름
+async function loadAllRecords(statusEl) {
   const records = [];
+  let anyOk = false;
   for (const key of Object.keys(DISCIPLINES)) {
     const dcfg = DISCIPLINES[key];
     let rows;
-    try { rows = await fetchTab(dcfg.tab); }
+    try { rows = await fetchTab(dcfg.tab); anyOk = true; }
     catch (e) { console.warn(`${dcfg.tab} 탭 로드 실패`, e); continue; }
     const col = dcfg.columns;
     rows.forEach(r => {
-      const sid = r.c[col.studentId] && r.c[col.studentId].v;
-      if (sid == null || String(sid).trim() !== String(studentId).trim()) return;
+      const name = String((r.c[col.name] && r.c[col.name].v) || '').trim();
+      const sid = String((r.c[col.studentId] && r.c[col.studentId].v) || '').trim();
+      const groupKey = sid || name;
+      if (!groupKey) return; // 이름·ID 둘 다 없으면 건너뜀
       const scores = dcfg.items.map(it => Number(r.c[it.col] && r.c[it.col].v) || 0);
       const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
       records.push({
-        discipline: key,
-        cells: r.c,
+        discipline: key, cells: r.c, groupKey,
         number: (r.c[col.number] && r.c[col.number].v) || '',
-        name: (r.c[col.name] && r.c[col.name].v) || '',
+        name: name || groupKey,
         dateText: formatDate(r.c[col.date] && r.c[col.date].v, r.c[col.date] && r.c[col.date].f),
         avg: avg.toFixed(1),
       });
     });
   }
-  if (records.length === 0) {
-    showDebugBox(`⚠️ 학생ID "${studentId}" 기록 없음\n댄스·보컬 탭 A열(학생ID)을 확인하세요.`, 'error');
+  if (!anyOk) {
+    showDebugBox('⚠️ 시트를 불러오지 못했습니다.\n댄스·보컬 탭이 "링크가 있는 모든 사용자"로 공개됐는지 확인.', 'error');
     return;
   }
-  // 진단번호 역순(최신 먼저) 정렬
   records.sort((a, b) => String(b.number).localeCompare(String(a.number)));
-  window.__studentRecords = records;
-  const backBtn = document.getElementById('btn-back');
-  if (backBtn) backBtn.classList.remove('hidden');
-  renderHistoryList(records, 'all');
-  if (statusEl) { statusEl.textContent = `${records[0].name || studentId} · 진단 ${records.length}건`; statusEl.classList.add('loaded'); }
+  window.__allRecords = records;
+  if (statusEl) { statusEl.textContent = `진단 ${records.length}건 로드됨`; statusEl.classList.add('loaded'); }
 }
+
+// 대시보드(전체 학생) 화면 표시
+function showDashboard() {
+  document.getElementById('report-a4').classList.add('hidden');
+  document.getElementById('report-mobile').classList.add('hidden');
+  const sv = document.getElementById('student-view'); if (sv) sv.classList.add('hidden');
+  const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.remove('hidden');
+  const back = document.getElementById('btn-back'); if (back) back.classList.add('hidden');
+  renderDashboard();
+}
+
+// 학생 카드 렌더 (검색어 반영)
+function renderDashboard() {
+  const listEl = document.getElementById('student-list');
+  if (!listEl) return;
+  const recs = window.__allRecords || [];
+  const map = new Map();
+  recs.forEach(r => {
+    if (!map.has(r.groupKey)) map.set(r.groupKey, { key: r.groupKey, name: r.name, count: 0, discs: new Set(), latest: r.dateText, latestNo: r.number });
+    const s = map.get(r.groupKey);
+    s.count++; s.discs.add(r.discipline);
+    if (String(r.number).localeCompare(String(s.latestNo)) > 0) { s.latestNo = r.number; s.latest = r.dateText; }
+  });
+  let students = [...map.values()];
+  const q = (document.getElementById('dv-search') && document.getElementById('dv-search').value || '').trim();
+  if (q) students = students.filter(s => s.name.includes(q) || s.key.includes(q));
+  students.sort((a, b) => String(b.latestNo).localeCompare(String(a.latestNo)));
+  window.__dashStudents = students; // 인덱스로 클릭 처리(따옴표 문제 회피)
+  const countEl = document.getElementById('dv-count');
+  if (countEl) countEl.textContent = `학생 ${students.length}명`;
+  listEl.innerHTML = students.map((s, i) =>
+    `<button class="stu-item" onclick="openStudentByIndex(${i})">
+      <span class="stu-name">${s.name}</span>
+      <span class="stu-meta">${[...s.discs].map(d => DISCIPLINES[d].label).join('·')} · 진단 ${s.count}건</span>
+      <span class="stu-date">최근 ${s.latest || '-'}</span>
+    </button>`
+  ).join('') || '<p class="hist-empty">학생 기록이 없습니다. 시트를 확인하세요.</p>';
+}
+function openStudentByIndex(i) {
+  const s = (window.__dashStudents || [])[i];
+  if (s) openStudent(s.key);
+}
+
+// 특정 학생 → 이력 화면
+function openStudent(key) {
+  const recs = (window.__allRecords || []).filter(r => r.groupKey === String(key));
+  if (recs.length === 0) { showDebugBox(`⚠️ "${key}" 기록 없음`, 'error'); return; }
+  window.__studentRecords = recs;
+  const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.add('hidden');
+  renderHistoryList(recs, 'all');
+}
+function backToDashboard() { showDashboard(); }
 
 // 이력 목록 화면 렌더
 function renderHistoryList(records, filter) {
@@ -1520,6 +1616,8 @@ function renderHistoryList(records, filter) {
   if (!view || !listEl) return;
   document.getElementById('report-a4').classList.add('hidden');
   document.getElementById('report-mobile').classList.add('hidden');
+  const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.add('hidden');
+  const bb = document.getElementById('btn-back'); if (bb) bb.classList.remove('hidden');
   view.classList.remove('hidden');
   const nameEl = document.getElementById('sv-name');
   if (nameEl) nameEl.textContent = (records[0] && records[0].name) || '학생';
