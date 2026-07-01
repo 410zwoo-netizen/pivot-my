@@ -76,7 +76,7 @@ body {
 }
 /* 세로 여유를 활용해 차트를 키워 빈 느낌을 줄이고 시각적 무게중심을 확보 */
 .report.a4.simple .chart-section { margin: 10px 0; }
-.report.a4.simple .chart-wrap svg.radar { width: 330px; height: 330px; }
+.report.a4.simple .chart-wrap svg.radar { width: 300px; height: 300px; }
 /* 코멘트가 푸터와 너무 붙지 않도록 약간의 하단 간격 */
 .report.a4.simple .comment-line { margin-bottom: 6px; }
 /* 간소화 버전 푸터는 space-between이 바닥 정렬을 담당 (auto 마진 불필요) */
@@ -114,9 +114,9 @@ body {
 
 .chart-section { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
 /* 긴 코멘트일 때 차트 살짝 축소 */
-.report.long-comment .chart-wrap svg.radar { width: 270px; height: 270px; }
+.report.long-comment .chart-wrap svg.radar { width: 250px; height: 250px; }
 .chart-wrap { width: 46%; display: flex; justify-content: center; align-items: center; }
-.chart-wrap svg.radar { width: 300px; height: 300px; overflow: visible; }
+.chart-wrap svg.radar { width: 270px; height: 270px; overflow: visible; }
 .scores { width: 54%; }
 .score-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 0.5px dashed rgba(14,27,58,0.15); }
 .score-row:last-child { border-bottom: none; }
@@ -124,10 +124,11 @@ body {
 .score-row .bar { flex: 1.1; height: 6px; background: rgba(14,27,58,0.08); border-radius: 3px; overflow: hidden; }
 .score-row .bar .fill { height: 100%; background: #D4AF37; border-radius: 3px; }
 .score-row .num { width: 32px; text-align: right; font-size: 14px; font-weight: 800; }
-.score-row .grade { 
-  display: inline-block; padding: 2px 8px; border-radius: 3px;
-  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
-  min-width: 38px; text-align: center;
+.score-row .grade {
+  display: inline-block; box-sizing: border-box; width: 72px; padding: 2px 2px;
+  border-radius: 3px; white-space: nowrap; flex-shrink: 0;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em;
+  text-align: center;
 }
 .grade-1 { background: rgba(14,27,58,0.08); color: rgba(14,27,58,0.55); }
 .grade-2 { background: rgba(212,175,55,0.15); color: #8B7330; }
@@ -161,16 +162,17 @@ body {
 .score-avg .val { font-size: 22px; font-weight: 800; color: #C8302E; }
 
 .summary-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 8px 0;
+  display: grid; grid-template-columns: 1fr; gap: 8px; margin: 10px 0;
   flex-shrink: 0;
 }
-.summary-card { padding: 9px 12px; background: #FAF8F0; border-left: 3px solid #D4AF37; border-radius: 0 5px 5px 0; }
+.summary-card { padding: 10px 14px; background: #FAF8F0; border-left: 3px solid #D4AF37; border-radius: 0 5px 5px 0; }
 .summary-card.red { border-left-color: #C8302E; }
-.summary-card.dark { background: #0E1B3A; color: #fff; border-left-color: #D4AF37; }
-.summary-card .lab { font-size: 9.5px; letter-spacing: 0.2em; font-weight: 700; margin-bottom: 5px; color: #D4AF37; }
+.summary-card.final { border-left-color: #0E1B3A; background: rgba(14,27,58,0.04); }
+.summary-card .lab { font-size: 10px; letter-spacing: 0.2em; font-weight: 700; margin-bottom: 4px; color: #D4AF37; }
 .summary-card.red .lab { color: #C8302E; }
-.summary-card.dark .lab { color: #D4AF37; }
-.summary-card .val { font-size: 12px; font-weight: 700; line-height: 1.4; }
+.summary-card.final .lab { color: #0E1B3A; }
+.summary-card .val { font-size: 13px; font-weight: 700; line-height: 1.45; }
+.summary-card.final .val { font-size: 13px; font-weight: 600; font-style: italic; color: rgba(14,27,58,0.85); }
 
 .comment-line {
   background: rgba(14,27,58,0.04); border-left: 3px solid #0E1B3A;
@@ -333,42 +335,18 @@ body {
   <div class="chart-section">
     <div class="chart-wrap">
       <svg class="radar" id="radar-a4" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
-        <g fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1">
-          <polygon points="90.00,46.08 210.00,46.08 270.00,150.00 210.00,253.92 90.00,253.92 30.00,150.00"/>
-          <polygon points="105.00,72.06 195.00,72.06 240.00,150.00 195.00,227.94 105.00,227.94 60.00,150.00"/>
-          <polygon points="120.00,98.04 180.00,98.04 210.00,150.00 180.00,201.96 120.00,201.96 90.00,150.00"/>
-          <polygon points="135.00,124.02 165.00,124.02 180.00,150.00 165.00,175.98 135.00,175.98 120.00,150.00"/>
-        </g>
-        <g stroke="rgba(14,27,58,0.15)" stroke-width="1">
-          <line x1="150" y1="150" x2="90.00" y2="46.08"/>
-          <line x1="150" y1="150" x2="210.00" y2="46.08"/>
-          <line x1="150" y1="150" x2="270.00" y2="150.00"/>
-          <line x1="150" y1="150" x2="210.00" y2="253.92"/>
-          <line x1="150" y1="150" x2="90.00" y2="253.92"/>
-          <line x1="150" y1="150" x2="30.00" y2="150.00"/>
-        </g>
+        <g class="radar-grid" fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1"></g>
+        <g class="radar-axes" stroke="rgba(14,27,58,0.15)" stroke-width="1"></g>
         <polygon class="data-area" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="2.5"/>
         <g class="data-points" fill="#C8302E"></g>
-        <g font-family="Pretendard, sans-serif" font-weight="700" font-size="12" fill="#0E1B3A">
-          <text x="80" y="30" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
-          <text x="220" y="30" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
-          <text x="292" y="154" text-anchor="start" data-i18n="score_expr">표현력</text>
-          <text x="220" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
-          <text x="80" y="275" text-anchor="middle" data-i18n="score_potential">잠재력</text>
-          <text x="8" y="154" text-anchor="end" data-i18n="score_angle">앵글</text>
-        </g>
+        <g class="radar-labels" font-family="Pretendard, sans-serif" font-weight="700" font-size="12" fill="#0E1B3A"></g>
       </svg>
     </div>
 
     <div class="scores">
-      <div class="score-row"><span class="name" data-i18n="score_rhythm">리듬 & 그루브</span><div class="bar"><div class="fill" data-bar="0"></div></div><span class="num" data-score="0">8.5</span><span class="grade grade-4" data-grade="0">우수</span></div>
-      <div class="score-row"><span class="name" data-i18n="score_iso">아이솔레이션</span><div class="bar"><div class="fill" data-bar="1"></div></div><span class="num" data-score="1">7.0</span><span class="grade grade-3" data-grade="1">양호</span></div>
-      <div class="score-row"><span class="name" data-i18n="score_expr">표현력</span><div class="bar"><div class="fill" data-bar="2"></div></div><span class="num" data-score="2">7.5</span><span class="grade grade-3" data-grade="2">양호</span></div>
-      <div class="score-row"><span class="name" data-i18n="score_learn">습득력</span><div class="bar"><div class="fill" data-bar="3"></div></div><span class="num" data-score="3">8.0</span><span class="grade grade-4" data-grade="3">우수</span></div>
-      <div class="score-row"><span class="name" data-i18n="score_potential">잠재력</span><div class="bar"><div class="fill" data-bar="4"></div></div><span class="num" data-score="4">9.0</span><span class="grade grade-4" data-grade="4">우수</span></div>
-      <div class="score-row"><span class="name" data-i18n="score_angle">앵글</span><div class="bar"><div class="fill" data-bar="5"></div></div><span class="num" data-score="5">8.0</span><span class="grade grade-4" data-grade="5">우수</span></div>
+      <div class="scores-list"></div>
       <div class="score-avg">
-        <span class="lab" data-i18n="avg_label">6개 항목 평균</span>
+        <span class="lab" data-i18n="avg_label">7개 항목 평균</span>
         <div>
           <span class="val" data-field="avg">8.0</span>
           <span class="grade-big grade-4" data-avg-grade>우수</span>
@@ -388,14 +366,10 @@ body {
   <p class="section-label"><span data-i18n="section_summary">종합 진단 · SUMMARY</span></p>
 
   <div class="summary-grid">
-    <div class="summary-card"><p class="lab" data-i18n="level_label">현재 수준</p><p class="val" data-field="level">평균 8.0점 · 동급 상위 30%</p></div>
-    <div class="summary-card dark"><p class="lab" data-i18n="goal_label">학생 목표</p><p class="val" data-field="goal">서경대 · 서울예대</p></div>
+    <div class="summary-card"><p class="lab" data-i18n="level_label">현재 수준</p><p class="val" data-field="level">평균 8.0점 · 상위 30%</p></div>
     <div class="summary-card red"><p class="lab" data-i18n="strength_label">강점</p><p class="val" data-field="strength">잠재력 우수, 리듬감 우수</p></div>
     <div class="summary-card red"><p class="lab" data-i18n="weakness_label">보완 필요</p><p class="val" data-field="weakness">아이솔레이션 강화</p></div>
-  </div>
-
-  <div class="comment-line" data-field="comment">
-    타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.
+    <div class="summary-card final"><p class="lab" data-i18n="final_label">최종 평가</p><p class="val" data-field="comment">타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.</p></div>
   </div>
 
   <p class="section-label"><span data-i18n="section_prescription">맞춤 처방 · PRESCRIPTION</span></p>
@@ -408,24 +382,12 @@ body {
     <div class="items">
       <div class="item"><p class="lab">CLASS</p><p class="val" data-field="class">입시 전문반, 코레오 중급</p></div>
       <div class="item"><p class="lab">TRAINER</p><p class="val" data-field="rec_trainer">XXX · YYY 트레이너</p></div>
-      <div class="item"><p class="lab">FOCUS</p><p class="val" data-field="focus">아이솔레이션 강화, 표현력 보강</p></div>
       <div class="item"><p class="lab">SCHEDULE</p><p class="val" data-field="schedule">주 3회</p></div>
     </div>
   </div>
 
   <div class="footer-multi">
     <div class="footer-brand">PIVOT STUDIO</div>
-    <div class="footer-divider"></div>
-    <div class="footer-branches">
-      <div class="footer-branch">
-        <div class="b-name"><span data-i18n="branch_hufs">외대점</span> · <span class="b-sns">@pivot410studio_hufs</span></div>
-        <div class="b-addr" data-i18n="addr_hufs">서울 동대문구 이문동 324-4, 3층</div>
-      </div>
-      <div class="footer-branch">
-        <div class="b-name"><span data-i18n="branch_bangbae">방배점</span> · <span class="b-sns">pivot410studio_bangbae</span></div>
-        <div class="b-addr" data-i18n="addr_bangbae">서울 서초구 방배동 907-10, 3층</div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -466,42 +428,18 @@ body {
   <div class="chart-section">
     <div class="chart-wrap">
       <svg class="radar" id="radar-mobile" viewBox="-30 -20 360 360" xmlns="http://www.w3.org/2000/svg">
-      <g fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1">
-        <polygon points="90.00,46.08 210.00,46.08 270.00,150.00 210.00,253.92 90.00,253.92 30.00,150.00"/>
-        <polygon points="105.00,72.06 195.00,72.06 240.00,150.00 195.00,227.94 105.00,227.94 60.00,150.00"/>
-        <polygon points="120.00,98.04 180.00,98.04 210.00,150.00 180.00,201.96 120.00,201.96 90.00,150.00"/>
-        <polygon points="135.00,124.02 165.00,124.02 180.00,150.00 165.00,175.98 135.00,175.98 120.00,150.00"/>
-      </g>
-      <g stroke="rgba(14,27,58,0.15)" stroke-width="1">
-        <line x1="150" y1="150" x2="90.00" y2="46.08"/>
-        <line x1="150" y1="150" x2="210.00" y2="46.08"/>
-        <line x1="150" y1="150" x2="270.00" y2="150.00"/>
-        <line x1="150" y1="150" x2="210.00" y2="253.92"/>
-        <line x1="150" y1="150" x2="90.00" y2="253.92"/>
-        <line x1="150" y1="150" x2="30.00" y2="150.00"/>
-      </g>
+      <g class="radar-grid" fill="none" stroke="rgba(14,27,58,0.12)" stroke-width="1"></g>
+      <g class="radar-axes" stroke="rgba(14,27,58,0.15)" stroke-width="1"></g>
       <polygon class="data-area" fill="rgba(212,175,55,0.25)" stroke="#D4AF37" stroke-width="2.5"/>
       <g class="data-points" fill="#C8302E"></g>
-      <g font-family="Pretendard, sans-serif" font-weight="700" font-size="13" fill="#0E1B3A">
-        <text x="80" y="30" text-anchor="middle" data-i18n="score_rhythm">리듬 & 그루브</text>
-        <text x="220" y="30" text-anchor="middle" data-i18n="score_iso">아이솔레이션</text>
-        <text x="296" y="154" text-anchor="start" data-i18n="score_expr">표현력</text>
-        <text x="220" y="275" text-anchor="middle" data-i18n="score_learn">습득력</text>
-        <text x="80" y="275" text-anchor="middle" data-i18n="score_potential">잠재력</text>
-        <text x="4" y="154" text-anchor="end" data-i18n="score_angle">앵글</text>
-      </g>
+      <g class="radar-labels" font-family="Pretendard, sans-serif" font-weight="700" font-size="13" fill="#0E1B3A"></g>
     </svg>
   </div>
 
   <div class="scores">
-    <div class="score-row"><span class="name" data-i18n="score_rhythm">리듬 & 그루브</span><div class="bar"><div class="fill" data-bar="0"></div></div><span class="num" data-score="0">8.5</span><span class="grade grade-4" data-grade="0">우수</span></div>
-    <div class="score-row"><span class="name" data-i18n="score_iso">아이솔레이션</span><div class="bar"><div class="fill" data-bar="1"></div></div><span class="num" data-score="1">7.0</span><span class="grade grade-3" data-grade="1">양호</span></div>
-    <div class="score-row"><span class="name" data-i18n="score_expr">표현력</span><div class="bar"><div class="fill" data-bar="2"></div></div><span class="num" data-score="2">7.5</span><span class="grade grade-3" data-grade="2">양호</span></div>
-    <div class="score-row"><span class="name" data-i18n="score_learn">습득력</span><div class="bar"><div class="fill" data-bar="3"></div></div><span class="num" data-score="3">8.0</span><span class="grade grade-4" data-grade="3">우수</span></div>
-    <div class="score-row"><span class="name" data-i18n="score_potential">잠재력</span><div class="bar"><div class="fill" data-bar="4"></div></div><span class="num" data-score="4">9.0</span><span class="grade grade-4" data-grade="4">우수</span></div>
-    <div class="score-row"><span class="name" data-i18n="score_angle">앵글</span><div class="bar"><div class="fill" data-bar="5"></div></div><span class="num" data-score="5">8.0</span><span class="grade grade-4" data-grade="5">우수</span></div>
+    <div class="scores-list"></div>
     <div class="score-avg">
-      <span class="lab" data-i18n="avg_label">6개 항목 평균</span>
+      <span class="lab" data-i18n="avg_label">7개 항목 평균</span>
       <div>
         <span class="val" data-field="avg">8.0</span>
         <span class="grade-big grade-4" data-avg-grade>우수</span>
@@ -522,28 +460,13 @@ body {
 
   <div class="summary-grid">
     <div class="summary-card"><p class="lab" data-i18n="level_label">현재 수준</p><p class="val" data-field="level">평균 8.0점 · 상위 30%</p></div>
-    <div class="summary-card dark"><p class="lab" data-i18n="goal_label">학생 목표</p><p class="val" data-field="goal">서경대 · 서울예대</p></div>
     <div class="summary-card red"><p class="lab" data-i18n="strength_label">강점</p><p class="val" data-field="strength">잠재력 우수, 리듬감 우수</p></div>
     <div class="summary-card red"><p class="lab" data-i18n="weakness_label">보완 필요</p><p class="val" data-field="weakness">아이솔레이션 강화</p></div>
-  </div>
-
-  <div class="comment-line" data-field="comment">
-    타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.
+    <div class="summary-card final"><p class="lab" data-i18n="final_label">최종 평가</p><p class="val" data-field="comment">타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.</p></div>
   </div>
 
   <div class="footer-multi">
     <div class="footer-brand">PIVOT STUDIO</div>
-    <div class="footer-divider"></div>
-    <div class="footer-branches">
-      <div class="footer-branch">
-        <div class="b-name"><span data-i18n="branch_hufs">외대점</span> · <span class="b-sns">@pivot410studio_hufs</span></div>
-        <div class="b-addr" data-i18n="addr_hufs">서울 동대문구 이문동 324-4, 3층</div>
-      </div>
-      <div class="footer-branch">
-        <div class="b-name"><span data-i18n="branch_bangbae">방배점</span> · <span class="b-sns">pivot410studio_bangbae</span></div>
-        <div class="b-addr" data-i18n="addr_bangbae">서울 서초구 방배동 907-10, 3층</div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -556,33 +479,37 @@ body {
 const SHEET_ID = '1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4'; // ← 박힘
 const SHEET_NAME = '시트1'; // 시트 탭 이름
 
-// 시트 열 구성 (변경 시 여기 동기화 필요)
+// 시트 열 구성 — 점수 외 필드 (점수 7개는 아래 ITEMS 에서 관리)
 const COLUMNS = {
-  number: 0,        // A: 진단번호
-  date: 1,          // B: 진단일자 (강사 입력: 5/20 또는 5-20)
-  date_formatted: 22, // W: 진단일자 자동변환 (시트 수식이 자동 생성: 2026.05.20)
-  trainer: 2,       // C: 진단 트레이너
-  name: 3,          // D: 학생 이름
-  grade: 4,         // E: 학년
-  track: 5,         // F: 트랙 (입시/아이돌/댄서/취미)
-  genre: 6,         // G: 장르
-  branch: 7,        // H: 점포
-  goal: 8,          // I: 학생 목표
-  score_rhythm: 9,  // J: 리듬&그루브 (0~10)
-  score_iso: 10,    // K: 아이솔레이션 (0~10)
-  score_expr: 11,   // L: 표현력 (0~10)
-  score_learn: 12,  // M: 습득력 (0~10)
-  score_potential: 13, // N: 잠재력 (0~10)
-  score_angle: 14,  // O: 앵글 (0~10) ※ 기존 강사메모(level)란을 앵글 점수로 전환
-  level: 14,        // O: (자동계산으로 표시되므로 시트 O열은 읽지 않음 → 앵글과 열 공유 무방)
-  strength: 15,     // P: 강점
-  weakness: 16,     // Q: 보완 필요
-  comment: 17,      // R: 한줄 코멘트
-  rec_class: 18,    // S: 추천 클래스
-  rec_trainer: 19,  // T: 추천 트레이너
-  focus: 20,        // U: 집중 영역
-  schedule: 21      // V: 주간 일정
+  number: 0,       // A: 진단번호
+  date: 1,         // B: 진단일자 (강사 입력: 6/20)
+  trainer: 2,      // C: 진단 트레이너
+  name: 3,         // D: 학생 이름
+  grade: 4,        // E: 학년
+  track: 5,        // F: 트랙 (입시/아이돌/댄서/취미)
+  genre: 6,        // G: 장르
+  // H~N: 진단 점수 7개 → ITEMS 참조
+  strength: 14,    // O: 강점
+  weakness: 15,    // P: 보완 필요
+  comment: 16,     // Q: 최종평가
+  rec_class: 17,   // R: 추천 클래스
+  rec_trainer: 18, // S: 추천 트레이너
+  schedule: 19     // T: 주간 일정
 };
+
+// 진단 항목 (유일한 기준) — 순서 = 시트 점수 열(H~) = 레이더/점수줄 순서
+// ★ 항목 추가 시(예: 스타일링·에티튜드): 이 배열에 { key, col } 한 줄 +
+//   I18N 각 언어에 key 라벨 한 줄만 추가하면 끝.
+//   (레이더 격자·축선·라벨, 점수줄, 평균이 모두 자동 반영됨)
+const ITEMS = [
+  { key: 'score_rhythm',    col: 7  },  // H: 리듬 & 그루브
+  { key: 'score_iso',       col: 8  },  // I: 아이솔레이션
+  { key: 'score_expr',      col: 9  },  // J: 표현력
+  { key: 'score_learn',     col: 10 },  // K: 습득력
+  { key: 'score_potential', col: 11 },  // L: 잠재력
+  { key: 'score_angle',     col: 12 },  // M: 앵글
+  { key: 'score_power',     col: 13 },  // N: 힘 (완급조절)
+];
 
 // ========================================
 // 등급 시스템 + 차트 좌표
@@ -655,33 +582,83 @@ function getGrade(score) {
   return { label: t.g_탁월, cls: 'grade-5' };
 }
 
+// ===== 레이더 차트 기하 (항목 개수 N에 자동 대응) =====
+const RADAR_CENTER = 150;   // SVG 중심 좌표
+const RADAR_MAXR = 120;     // 10점 = 반지름 120
+const RADAR_RINGS = [1, 0.75, 0.5, 0.25]; // 동심 격자 (120·90·60·30)
+
+// i번째 항목의 각도(도). 첫 항목이 정상(위), 시계방향으로 균등 배치
+function itemAngleDeg(i, n) { return -90 + i * 360 / n; }
+
+// i번째 항목의 꼭짓점 좌표 (반지름 radius)
+function radarVertex(i, n, radius) {
+  const rad = itemAngleDeg(i, n) * Math.PI / 180;
+  return {
+    x: RADAR_CENTER + radius * Math.cos(rad),
+    y: RADAR_CENTER + radius * Math.sin(rad),
+  };
+}
+
+// 점수 배열 → 데이터 다각형 좌표
 function calcRadarPoints(scores) {
-  // 6각형 정점의 각도 (윗변이 평평한 형태, 항목 순서대로)
-  // 리듬(좌상) → 아이솔(우상) → 표현(우) → 습득(우하) → 잠재(좌하) → 앵글(좌)
-  const angles = [-120, -60, 0, 60, 120, 180]; // degrees
-  const center = 150;
-  const maxRadius = 120; // 점수 10점 만점 = 반지름 120
-  
+  const n = scores.length;
   return scores.map((score, i) => {
-    const rad = angles[i] * Math.PI / 180;
-    const r = (score / 10) * maxRadius;  // 10점 만점
-    const x = center + r * Math.cos(rad);
-    const y = center + r * Math.sin(rad);
-    return { x: x.toFixed(2), y: y.toFixed(2) };
+    const v = radarVertex(i, n, (score / 10) * RADAR_MAXR);
+    return { x: v.x.toFixed(2), y: v.y.toFixed(2) };
   });
 }
 
+// 레이더의 격자·축선·라벨을 ITEMS 기준으로 자동 생성 (항목이 늘어도 코드 수정 불필요)
+function renderRadarChrome(svgId) {
+  const svg = document.getElementById(svgId);
+  if (!svg) return;
+  const n = ITEMS.length;
+  const t = I18N[currentLang];
+
+  // 동심 격자 다각형
+  svg.querySelector('.radar-grid').innerHTML = RADAR_RINGS.map(f => {
+    const pts = ITEMS.map((_, i) => {
+      const v = radarVertex(i, n, RADAR_MAXR * f);
+      return `${v.x.toFixed(2)},${v.y.toFixed(2)}`;
+    }).join(' ');
+    return `<polygon points="${pts}"/>`;
+  }).join('');
+
+  // 중심에서 각 꼭짓점으로 뻗는 축선
+  svg.querySelector('.radar-axes').innerHTML = ITEMS.map((_, i) => {
+    const v = radarVertex(i, n, RADAR_MAXR);
+    return `<line x1="${RADAR_CENTER}" y1="${RADAR_CENTER}" x2="${v.x.toFixed(2)}" y2="${v.y.toFixed(2)}"/>`;
+  }).join('');
+
+  // 꼭짓점 바깥 라벨 (각도에 따라 정렬·여백 자동 결정)
+  svg.querySelector('.radar-labels').innerHTML = ITEMS.map((it, i) => {
+    const v = radarVertex(i, n, RADAR_MAXR + 20);
+    const cos = Math.cos(itemAngleDeg(i, n) * Math.PI / 180);
+    const sin = Math.sin(itemAngleDeg(i, n) * Math.PI / 180);
+    const anchor = cos > 0.3 ? 'start' : (cos < -0.3 ? 'end' : 'middle');
+    const dy = sin < -0.5 ? -3 : (sin > 0.5 ? 12 : 4);
+    return `<text x="${v.x.toFixed(1)}" y="${(v.y + dy).toFixed(1)}" text-anchor="${anchor}" data-i18n="${it.key}">${t[it.key] || it.key}</text>`;
+  }).join('');
+}
+
+// 점수줄(막대 목록)을 ITEMS 기준으로 자동 생성
+function buildScoreRows() {
+  const t = I18N[currentLang];
+  document.querySelectorAll('.scores-list').forEach(list => {
+    list.innerHTML = ITEMS.map((it, i) =>
+      `<div class="score-row"><span class="name" data-i18n="${it.key}">${t[it.key] || it.key}</span><div class="bar"><div class="fill" data-bar="${i}"></div></div><span class="num" data-score="${i}">0.0</span><span class="grade" data-grade="${i}"></span></div>`
+    ).join('');
+  });
+}
+
+// 레이더 데이터 영역(다각형+점) 갱신
 function updateChart(svgId, scores) {
   const svg = document.getElementById(svgId);
   if (!svg) return;
-  
+
   const points = calcRadarPoints(scores);
-  const polygonPoints = points.map(p => `${p.x},${p.y}`).join(' ');
-  
-  svg.querySelector('.data-area').setAttribute('points', polygonPoints);
-  
-  const pointsGroup = svg.querySelector('.data-points');
-  pointsGroup.innerHTML = points.map(p => 
+  svg.querySelector('.data-area').setAttribute('points', points.map(p => `${p.x},${p.y}`).join(' '));
+  svg.querySelector('.data-points').innerHTML = points.map(p =>
     `<circle cx="${p.x}" cy="${p.y}" r="4"/>`
   ).join('');
 }
@@ -712,7 +689,8 @@ const I18N = {
     score_learn: '습득력',
     score_potential: '잠재력',
     score_angle: '앵글',
-    avg_label: '6개 항목 평균',
+    score_power: '힘 (완급조절)',
+    avg_label: '7개 항목 평균',
     avg_label_short: '평균',
     grade_basic: '기초 (0~3.5)',
     grade_growing: '발전 (4~5.5)',
@@ -720,7 +698,7 @@ const I18N = {
     grade_excellent: '우수 (8~9)',
     grade_outstanding: '탁월 (9.5~10)',
     level_label: '현재 수준',
-    goal_label: '학생 목표',
+    final_label: '최종 평가',
     strength_label: '강점',
     weakness_label: '보완 필요',
     prescription_label: 'PIVOT 맞춤 커리큘럼',
@@ -732,10 +710,8 @@ const I18N = {
     // 등급 (요약 카드용)
     g_기초: '기초', g_발전: '발전', g_양호: '양호', g_우수: '우수', g_탁월: '탁월',
     // 상위 %
-    pct_top5: '상위 5%', pct_top10: '상위 10%', pct_top20: '상위 20%',
-    pct_top30: '상위 30%', pct_top40: '상위 40%', pct_top50: '상위 50%',
-    pct_top60: '상위 60%', pct_top70: '상위 70%',
-    pct_avg: '평균 수준', pct_basic: '기초 단계',
+    pct_top: (n) => `상위 ${n}%`,
+    pct_avg: '평균 수준',
     // 현재 수준 포맷
     level_format: (avg, pct, grade) => `평균 ${avg}점 · ${pct} · ${grade}`,
     branch_hufs: '외대점',
@@ -847,6 +823,7 @@ const I18N = {
     score_learn: 'Learning',
     score_potential: 'Potential',
     score_angle: 'Angle',
+    score_power: 'Dynamics',
     avg_label: 'Overall Average',
     avg_label_short: 'Average',
     grade_basic: 'Basic (0-3.5)',
@@ -855,7 +832,7 @@ const I18N = {
     grade_excellent: 'Excellent (8-9)',
     grade_outstanding: 'Outstanding (9.5-10)',
     level_label: 'Current Level',
-    goal_label: 'Student Goal',
+    final_label: 'Final Review',
     strength_label: 'Strengths',
     weakness_label: 'To Improve',
     prescription_label: 'Custom Curriculum',
@@ -864,10 +841,8 @@ const I18N = {
     track_댄서: 'Dancer Track',
     track_취미: 'Hobby Track',
     g_기초: 'Basic', g_발전: 'Growing', g_양호: 'Good', g_우수: 'Excellent', g_탁월: 'Outstanding',
-    pct_top5: 'Top 5%', pct_top10: 'Top 10%', pct_top20: 'Top 20%',
-    pct_top30: 'Top 30%', pct_top40: 'Top 40%', pct_top50: 'Top 50%',
-    pct_top60: 'Top 60%', pct_top70: 'Top 70%',
-    pct_avg: 'Average Level', pct_basic: 'Beginning Stage',
+    pct_top: (n) => `Top ${n}%`,
+    pct_avg: 'Average Level',
     level_format: (avg, pct, grade) => `Avg ${avg} · ${pct} · ${grade}`,
     branch_hufs: 'Hufs Branch',
     branch_bangbae: 'Bangbae Branch',
@@ -978,7 +953,8 @@ const I18N = {
     score_learn: '習得力',
     score_potential: 'ポテンシャル',
     score_angle: 'アングル',
-    avg_label: '6項目平均',
+    score_power: 'ダイナミクス',
+    avg_label: '7項目平均',
     avg_label_short: '平均',
     grade_basic: '基礎 (0~3.5)',
     grade_growing: '発展 (4~5.5)',
@@ -986,7 +962,7 @@ const I18N = {
     grade_excellent: '優秀 (8~9)',
     grade_outstanding: '卓越 (9.5~10)',
     level_label: '現在のレベル',
-    goal_label: '学生の目標',
+    final_label: '総合評価',
     strength_label: '強み',
     weakness_label: '改善点',
     prescription_label: 'PIVOTカスタムカリキュラム',
@@ -995,10 +971,8 @@ const I18N = {
     track_댄서: 'ダンサートラック',
     track_취미: '趣味トラック',
     g_기초: '基礎', g_발전: '発展', g_양호: '良好', g_우수: '優秀', g_탁월: '卓越',
-    pct_top5: '上位5%', pct_top10: '上位10%', pct_top20: '上位20%',
-    pct_top30: '上位30%', pct_top40: '上位40%', pct_top50: '上位50%',
-    pct_top60: '上位60%', pct_top70: '上位70%',
-    pct_avg: '平均レベル', pct_basic: '基礎段階',
+    pct_top: (n) => `上位${n}%`,
+    pct_avg: '平均レベル',
     level_format: (avg, pct, grade) => `平均${avg}点 · ${pct} · ${grade}`,
     branch_hufs: '外大店',
     branch_bangbae: '方背店',
@@ -1109,7 +1083,8 @@ const I18N = {
     score_learn: '学习力',
     score_potential: '潜力',
     score_angle: '角度',
-    avg_label: '6项平均',
+    score_power: '力度控制',
+    avg_label: '7项平均',
     avg_label_short: '平均',
     grade_basic: '基础 (0~3.5)',
     grade_growing: '成长 (4~5.5)',
@@ -1117,7 +1092,7 @@ const I18N = {
     grade_excellent: '优秀 (8~9)',
     grade_outstanding: '卓越 (9.5~10)',
     level_label: '现状水平',
-    goal_label: '学生目标',
+    final_label: '最终评价',
     strength_label: '优势',
     weakness_label: '待改进',
     prescription_label: 'PIVOT 定制课程',
@@ -1126,10 +1101,8 @@ const I18N = {
     track_댄서: '舞者方向',
     track_취미: '兴趣方向',
     g_기초: '基础', g_발전: '成长', g_양호: '良好', g_우수: '优秀', g_탁월: '卓越',
-    pct_top5: '前5%', pct_top10: '前10%', pct_top20: '前20%',
-    pct_top30: '前30%', pct_top40: '前40%', pct_top50: '前50%',
-    pct_top60: '前60%', pct_top70: '前70%',
-    pct_avg: '平均水平', pct_basic: '基础阶段',
+    pct_top: (n) => `前${n}%`,
+    pct_avg: '平均水平',
     level_format: (avg, pct, grade) => `平均${avg}分 · ${pct} · ${grade}`,
     branch_hufs: '外大店',
     branch_bangbae: '方背店',
@@ -1475,16 +1448,17 @@ function formatDate(rawValue, rawFormatted) {
 // 점수 → 추정 상위 % (PIVOT 학원 누적 데이터 기준 추정)
 function getPercentile(avgScore) {
   const t = I18N[currentLang];
-  if (avgScore >= 9.5) return t.pct_top5;
-  if (avgScore >= 9.0) return t.pct_top10;
-  if (avgScore >= 8.5) return t.pct_top20;
-  if (avgScore >= 8.0) return t.pct_top30;
-  if (avgScore >= 7.5) return t.pct_top40;
-  if (avgScore >= 7.0) return t.pct_top50;
-  if (avgScore >= 6.5) return t.pct_top60;
-  if (avgScore >= 6.0) return t.pct_top70;
-  if (avgScore >= 5.0) return t.pct_avg;
-  return t.pct_basic;
+  // 백분위 기준 (후하게) — 숫자만 바꾸면 4개 언어 모두 자동 반영됨
+  if (avgScore >= 9.5) return t.pct_top(3);
+  if (avgScore >= 9.0) return t.pct_top(5);
+  if (avgScore >= 8.5) return t.pct_top(10);
+  if (avgScore >= 8.0) return t.pct_top(15);
+  if (avgScore >= 7.5) return t.pct_top(20);
+  if (avgScore >= 7.0) return t.pct_top(25);
+  if (avgScore >= 6.5) return t.pct_top(30);
+  if (avgScore >= 6.0) return t.pct_top(40);
+  if (avgScore >= 5.0) return t.pct_top(50);
+  return t.pct_avg;
 }
 
 function applyData(cells) {
@@ -1494,13 +1468,7 @@ function applyData(cells) {
   const textFields = {
     'number': `No. ${getCellValue(cells, COLUMNS.number)}`,
     'stamp': `No. ${getCellValue(cells, COLUMNS.number)}`,
-    'date': (() => {
-      // W열(자동변환)이 있으면 우선 사용
-      const w = getCellValue(cells, COLUMNS.date_formatted);
-      if (w) return w;
-      // 없으면 B열 fallback
-      return formatDate(getCellValue(cells, COLUMNS.date), cells[COLUMNS.date] && cells[COLUMNS.date].f);
-    })(),
+    'date': formatDate(getCellValue(cells, COLUMNS.date), cells[COLUMNS.date] && cells[COLUMNS.date].f),
     'trainer': getCellValue(cells, COLUMNS.trainer),
     'name': getCellValue(cells, COLUMNS.name),
     'grade': translateOptions(getCellValue(cells, COLUMNS.grade)),
@@ -1509,15 +1477,12 @@ function applyData(cells) {
       return I18N[currentLang][`track_${t}`] || `${t} 트랙`;
     })(),
     'genre': translateOptions(getCellValue(cells, COLUMNS.genre)),
-    'branch': getCellValue(cells, COLUMNS.branch),
-    'goal': getCellValue(cells, COLUMNS.goal),
-    // 'level'은 자동 계산으로 처리 (시트 O열 무시)
+    // 'level'은 평균 점수로 자동 계산 (아래에서 처리)
     'strength': translateOptions(getCellValue(cells, COLUMNS.strength)),
     'weakness': translateOptions(getCellValue(cells, COLUMNS.weakness)),
     'comment': getCellValue(cells, COLUMNS.comment),
     'class': translateOptions(getCellValue(cells, COLUMNS.rec_class)),
     'rec_trainer': getCellValue(cells, COLUMNS.rec_trainer),
-    'focus': translateOptions(getCellValue(cells, COLUMNS.focus)),
     'schedule': translateOptions(getCellValue(cells, COLUMNS.schedule))
   };
   
@@ -1527,10 +1492,10 @@ function applyData(cells) {
     });
   });
   
-  // 코멘트 길이에 따라 자동 폰트 조절
+  // 최종평가(코멘트) 길이에 따라 자동 폰트 조절
   const commentText = textFields['comment'] || '';
   const commentLen = commentText.length;
-  document.querySelectorAll('.comment-line').forEach(el => {
+  document.querySelectorAll('.summary-card.final .val').forEach(el => {
     if (commentLen > 150) {
       el.style.fontSize = '11px';
       el.style.lineHeight = '1.5';
@@ -1549,8 +1514,8 @@ function applyData(cells) {
   const strengthText = textFields['strength'] || '';
   const weaknessText = textFields['weakness'] || '';
   const maxSummaryLen = Math.max(strengthText.length, weaknessText.length);
-  
-  document.querySelectorAll('.summary-card .val').forEach(el => {
+
+  document.querySelectorAll('.summary-card:not(.final) .val').forEach(el => {
     if (maxSummaryLen > 40) {
       el.style.fontSize = '11px';
       el.style.lineHeight = '1.4';
@@ -1563,12 +1528,11 @@ function applyData(cells) {
     }
   });
   
-  // === 처방 박스 (CLASS/FOCUS) 데이터 길이별 자동 폰트 조절 ===
+  // === 처방 박스 (CLASS/TRAINER/SCHEDULE) 데이터 길이별 자동 폰트 조절 ===
   const classText = textFields['class'] || '';
-  const focusText = textFields['focus'] || '';
   const scheduleText = textFields['schedule'] || '';
   const recTrainerText = textFields['rec_trainer'] || '';
-  const maxPrescLen = Math.max(classText.length, focusText.length, scheduleText.length, recTrainerText.length);
+  const maxPrescLen = Math.max(classText.length, scheduleText.length, recTrainerText.length);
   
   document.querySelectorAll('.prescription .item .val').forEach(el => {
     if (maxPrescLen > 35) {
@@ -1584,7 +1548,7 @@ function applyData(cells) {
   });
   
   // === 전체 콘텐츠 길이 측정해서 매우 길면 추가 압축 ===
-  const totalLen = strengthText.length + weaknessText.length + classText.length + focusText.length + commentText.length;
+  const totalLen = strengthText.length + weaknessText.length + classText.length + commentText.length;
   document.querySelectorAll('.report').forEach(r => {
     r.classList.remove('content-medium', 'content-long', 'content-very-long');
     if (totalLen > 180) {
@@ -1596,15 +1560,8 @@ function applyData(cells) {
     }
   });
   
-  // 점수
-  const scores = [
-    Number(getCellValue(cells, COLUMNS.score_rhythm)) || 0,
-    Number(getCellValue(cells, COLUMNS.score_iso)) || 0,
-    Number(getCellValue(cells, COLUMNS.score_expr)) || 0,
-    Number(getCellValue(cells, COLUMNS.score_learn)) || 0,
-    Number(getCellValue(cells, COLUMNS.score_potential)) || 0,
-    Number(getCellValue(cells, COLUMNS.score_angle)) || 0
-  ];
+  // 점수 (ITEMS 순서대로 시트 열에서 읽음)
+  const scores = ITEMS.map(it => Number(getCellValue(cells, it.col)) || 0);
   
   scores.forEach((s, i) => {
     // 10점 만점 표기 (소수점 1자리, 8.0 표시)
@@ -1652,8 +1609,8 @@ function applySampleData() {
   const sampleData = {
     'strength': '잠재력 우수, 리듬감 우수',
     'weakness': '아이솔레이션 강화',
+    'comment': '타고난 음악성과 잠재력이 우수합니다. 아이솔레이션 보강에 집중하면 큰 성장이 기대됩니다.',
     'class': '입시 전문반, 코레오 중급',
-    'focus': '아이솔레이션 강화, 표현력 보강',
     'grade': '고등학교 2학년',
     'genre': '코레오, 힙합',
     'schedule': '주 3회'
@@ -1664,7 +1621,7 @@ function applySampleData() {
     });
   });
   
-  const sampleScores = [8.5, 7.0, 7.5, 8.0, 9.0, 8.0];
+  const sampleScores = [8.5, 7.0, 7.5, 8.0, 9.0, 8.0, 7.5];
   updateChart('radar-a4', sampleScores);
   updateChart('radar-mobile', sampleScores);
   
@@ -1686,6 +1643,11 @@ function applySampleData() {
   const sampleLevel = I18N[currentLang].level_format(sampleAvg, getPercentile(sampleAvgNum), sampleAg.label);
   document.querySelectorAll('[data-field="level"]').forEach(el => el.textContent = sampleLevel);
 }
+
+// 항목(ITEMS) 기준으로 점수줄·레이더 골격을 최초 1회 생성
+buildScoreRows();
+renderRadarChrome('radar-a4');
+renderRadarChrome('radar-mobile');
 
 applySampleData();
 
