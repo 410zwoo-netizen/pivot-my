@@ -144,6 +144,40 @@ body {
   background: none; border: none; cursor: pointer; padding: 0; margin-bottom: 6px;
   font-size: 12px; font-weight: 700; color: #D4AF37; font-family: inherit;
 }
+.dv-actions { display: flex; gap: 8px; align-items: center; }
+.dv-new {
+  padding: 9px 14px; background: #0E1B3A; color: #fff; border: none; border-radius: 6px;
+  font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.dv-new:hover { background: #1a2a4d; }
+
+/* === 새 진단 입력 폼 === */
+#input-view {
+  width: 794px; max-width: 94vw; margin: 0 auto; padding: 28px 32px;
+  background: #FFFFFF; color: #0E1B3A; border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.in-select { padding: 8px 12px; border: 1px solid rgba(14,27,58,0.2); border-radius: 6px; font-size: 14px; font-weight: 700; font-family: inherit; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin: 12px 0; }
+#input-view label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; color: rgba(14,27,58,0.7); }
+#input-view input, #input-view textarea {
+  padding: 8px 10px; border: 1px solid rgba(14,27,58,0.2); border-radius: 5px;
+  font-size: 14px; font-family: inherit; color: #0E1B3A; font-weight: 500;
+}
+#input-view input:focus, #input-view textarea:focus { outline: none; border-color: #D4AF37; }
+.form-full { display: flex; flex-direction: column; gap: 4px; margin: 4px 0 12px; font-size: 12px; font-weight: 700; color: rgba(14,27,58,0.7); }
+.form-section { font-size: 11px; letter-spacing: 0.15em; font-weight: 700; color: #D4AF37; margin: 16px 0 8px; }
+.score-inputs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.score-inputs label { font-size: 12px; }
+.form-actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(14,27,58,0.12); }
+.form-submit {
+  padding: 11px 22px; background: #C8302E; color: #fff; border: none; border-radius: 6px;
+  font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit;
+}
+.form-submit:hover { background: #a82724; }
+.in-status { font-size: 13px; font-weight: 700; }
+.in-status.ok { color: #2E9E4F; }
+.in-status.err { color: #C8302E; }
 
 .header { 
   display: flex; justify-content: space-between; align-items: flex-start;
@@ -347,7 +381,7 @@ body {
 
 <div class="toggle-bar">
   <strong style="color: #D4AF37;">📋 PIVOT 진단서</strong>
-  <button id="btn-back" class="hidden" onclick="backToList()">← 목록</button>
+  <button id="btn-back" class="hidden" onclick="reportBack()">← 뒤로</button>
   <button id="btn-a4" class="active" onclick="show('a4')">A4 (처방 포함)</button>
   <button id="btn-mobile" onclick="show('mobile')">A4 (처방 제외)</button>
   <span class="lang-section">
@@ -368,7 +402,10 @@ body {
       <p class="sv-label">PIVOT 진단 관리</p>
       <h2 id="dv-count">학생 목록</h2>
     </div>
-    <input id="dv-search" class="dv-search" type="text" placeholder="🔍 이름 검색" oninput="renderDashboard()">
+    <div class="dv-actions">
+      <input id="dv-search" class="dv-search" type="text" placeholder="🔍 이름 검색" oninput="renderDashboard()">
+      <button class="dv-new" onclick="openInputForm()">＋ 새 진단 작성</button>
+    </div>
   </div>
   <div id="student-list"></div>
   <p class="sv-hint">학생을 클릭하면 진단 이력이 열립니다.</p>
@@ -389,6 +426,48 @@ body {
   </div>
   <div id="history-list"></div>
   <p class="sv-hint">항목을 클릭하면 진단서가 열립니다. 상단 "← 목록"으로 이력으로 돌아올 수 있어요.</p>
+</div>
+
+<!-- 새 진단 입력 폼 (강사용) -->
+<div id="input-view" class="hidden">
+  <div class="sv-head">
+    <div>
+      <button class="sv-back" onclick="backToDashboard()">← 전체 학생</button>
+      <h2>새 진단 작성</h2>
+    </div>
+    <select id="in-discipline" class="in-select" onchange="buildScoreInputs()">
+      <option value="dance">댄스</option>
+      <option value="vocal">보컬</option>
+    </select>
+  </div>
+
+  <div class="form-grid">
+    <label>이름 <input id="in-name" type="text" placeholder="학생 이름"></label>
+    <label>학생ID <input id="in-studentId" type="text" placeholder="비워도 됨 (동명이인만)"></label>
+    <label>진단번호 <input id="in-number" type="text" placeholder="예: 2026-029"></label>
+    <label>진단일자 <input id="in-date" type="date"></label>
+    <label>트레이너 <input id="in-trainer" type="text"></label>
+    <label>학년 <input id="in-grade" type="text" placeholder="예: 고등학교 2학년"></label>
+    <label>트랙 <input id="in-track" type="text" placeholder="예: 입시"></label>
+    <label>장르 <input id="in-genre" type="text" placeholder="예: 힙합"></label>
+  </div>
+
+  <p class="form-section">점수 (0~10)</p>
+  <div id="in-scores" class="score-inputs"></div>
+
+  <div class="form-grid">
+    <label>강점 <input id="in-strength" type="text"></label>
+    <label>보완 필요 <input id="in-weakness" type="text"></label>
+    <label>추천 클래스 <input id="in-rec_class" type="text"></label>
+    <label>추천 트레이너 <input id="in-rec_trainer" type="text"></label>
+    <label>주간 일정 <input id="in-schedule" type="text" placeholder="예: 주 3회"></label>
+  </div>
+  <label class="form-full">최종 평가 <textarea id="in-comment" rows="3" placeholder="한줄 총평"></textarea></label>
+
+  <div class="form-actions">
+    <button class="form-submit" onclick="submitNewDiagnosis()">진단서 생성 &amp; 저장</button>
+    <span id="in-status" class="in-status"></span>
+  </div>
 </div>
 
 <!-- A4 -->
@@ -570,6 +649,9 @@ body {
 // 연결된 시트: PIVOT 진단 데이터
 // https://docs.google.com/spreadsheets/d/1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4/edit
 const SHEET_ID = '1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4'; // ← 박힘
+// (선택) 시트 저장용 Apps Script 웹앱 URL — 안내대로 배포 후 여기 붙여넣기.
+// 비워두면 저장 없이 리포트 생성만 됨.
+const SAVE_URL = '';
 // ========================================
 // 종목 설정 (댄스 / 보컬) — 유일한 기준
 // ★ 항목 추가나 종목 추가는 여기만 수정하면 레이더·점수줄·평균이 자동 반영됨.
@@ -1527,6 +1609,97 @@ function openStudent(key) {
 }
 function backToDashboard() { showDashboard(); }
 
+// 리포트에서 뒤로: 이력에서 왔으면 이력으로, 새 진단에서 왔으면 대시보드로
+function reportBack() {
+  if (window.__reportOrigin === 'history' && window.__studentRecords) backToList();
+  else showDashboard();
+}
+
+// ===== 새 진단 입력 폼 =====
+function openInputForm() {
+  ['dashboard-view', 'student-view', 'report-a4', 'report-mobile'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.classList.add('hidden');
+  });
+  const back = document.getElementById('btn-back'); if (back) back.classList.add('hidden');
+  document.getElementById('input-view').classList.remove('hidden');
+  // 오늘 날짜 기본값
+  const d = new Date();
+  const dateEl = document.getElementById('in-date');
+  if (dateEl && !dateEl.value) dateEl.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  buildScoreInputs();
+  setInStatus('', '');
+}
+
+// 선택한 종목의 점수 항목별 입력칸 생성
+function buildScoreInputs() {
+  const disc = document.getElementById('in-discipline').value;
+  const t = I18N.kr;
+  document.getElementById('in-scores').innerHTML = DISCIPLINES[disc].items.map(it =>
+    `<label>${t[it.key] || it.key}<input id="in-score-${it.key}" type="number" min="0" max="10" step="0.5" value="0"></label>`
+  ).join('');
+}
+
+function setInStatus(msg, cls) {
+  const st = document.getElementById('in-status');
+  if (st) { st.textContent = msg; st.className = 'in-status ' + (cls || ''); }
+}
+
+// 입력값 → 리포트 즉시 생성 + (SAVE_URL 있으면) 시트에 저장
+function submitNewDiagnosis() {
+  const disc = document.getElementById('in-discipline').value;
+  const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  if (!val('in-name')) { setInStatus('이름을 입력하세요.', 'err'); return; }
+  if (!val('in-number')) { setInStatus('진단번호를 입력하세요.', 'err'); return; }
+
+  setDiscipline(disc);
+  const col = DISCIPLINES[disc].columns;
+  const rawDate = val('in-date');
+  const dateFmt = rawDate ? rawDate.replace(/-/g, ' . ') : '';
+
+  // cells 배열 구성 (gviz와 동일 포맷)
+  const cells = [];
+  const set = (i, v) => { if (i != null) cells[i] = { v: v, f: v }; };
+  set(col.studentId, val('in-studentId'));
+  set(col.number, val('in-number'));
+  set(col.date, dateFmt);
+  set(col.trainer, val('in-trainer'));
+  set(col.name, val('in-name'));
+  set(col.grade, val('in-grade'));
+  set(col.track, val('in-track'));
+  set(col.genre, val('in-genre'));
+  DISCIPLINES[disc].items.forEach(it => set(it.col, val(`in-score-${it.key}`)));
+  set(col.strength, val('in-strength'));
+  set(col.weakness, val('in-weakness'));
+  set(col.comment, val('in-comment'));
+  set(col.rec_class, val('in-rec_class'));
+  set(col.rec_trainer, val('in-rec_trainer'));
+  set(col.schedule, val('in-schedule'));
+
+  // 리포트 생성
+  applyData(cells);
+  window.__reportOrigin = 'new';
+  document.getElementById('input-view').classList.add('hidden');
+  show('a4');
+  const back = document.getElementById('btn-back'); if (back) back.classList.remove('hidden');
+
+  // 시트 저장
+  saveRow(disc, cells, col);
+}
+
+// Apps Script 웹앱으로 한 줄 저장 (no-cors: 요청은 전달되나 응답은 못 읽음)
+function saveRow(disc, cells, col) {
+  if (!SAVE_URL) { console.log('SAVE_URL 미설정 → 저장 생략(생성만 됨)'); return; }
+  const maxCol = Math.max(col.schedule, ...DISCIPLINES[disc].items.map(it => it.col));
+  const row = [];
+  for (let i = 0; i <= maxCol; i++) row[i] = (cells[i] && cells[i].v != null) ? cells[i].v : '';
+  fetch(SAVE_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ discipline: disc, row: row }),
+  }).then(() => console.log('시트 저장 요청 전송됨'))
+    .catch(err => console.error('저장 실패', err));
+}
+
 // 이력 목록 화면 렌더
 function renderHistoryList(records, filter) {
   const view = document.getElementById('student-view');
@@ -1557,6 +1730,7 @@ function openRecord(index) {
   if (!rec) return;
   setDiscipline(rec.discipline);
   applyData(rec.cells);
+  window.__reportOrigin = 'history';
   document.getElementById('student-view').classList.add('hidden');
   const mobileActive = document.getElementById('btn-mobile') && document.getElementById('btn-mobile').classList.contains('active');
   show(mobileActive ? 'mobile' : 'a4');
