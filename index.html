@@ -150,6 +150,7 @@ body {
   font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap;
 }
 .dv-new:hover { background: #1a2a4d; }
+.sv-actionbar { margin: 2px 0 14px; }
 
 /* === 새 진단 입력 폼 === */
 #input-view {
@@ -424,6 +425,9 @@ body {
       <button class="sv-filter" data-filter="vocal" onclick="filterHistory('vocal')">보컬</button>
     </div>
   </div>
+  <div class="sv-actionbar">
+    <button class="dv-new" onclick="newForCurrentStudent()">＋ 이 학생 새 진단 추가</button>
+  </div>
   <div id="history-list"></div>
   <p class="sv-hint">항목을 클릭하면 진단서가 열립니다. 상단 "← 목록"으로 이력으로 돌아올 수 있어요.</p>
 </div>
@@ -444,7 +448,7 @@ body {
   <div class="form-grid">
     <label>이름 <input id="in-name" type="text" placeholder="학생 이름"></label>
     <label>학생ID <input id="in-studentId" type="text" placeholder="비워도 됨 (동명이인만)"></label>
-    <label>진단번호 <input id="in-number" type="text" placeholder="예: 2026-029"></label>
+    <label>진단번호 (자동·수정가능) <input id="in-number" type="text" placeholder="예: 2026-029"></label>
     <label>진단일자 <input id="in-date" type="date"></label>
     <label>트레이너 <input id="in-trainer" type="text"></label>
     <label>학년 <input id="in-grade" type="text" placeholder="예: 고등학교 2학년"></label>
@@ -1616,18 +1620,62 @@ function reportBack() {
 }
 
 // ===== 새 진단 입력 폼 =====
-function openInputForm() {
+// 다음 진단번호 자동 계산: 올해(YYYY) 기존 최대 번호 +1 → 'YYYY-NNN'
+function nextDiagnosisNumber() {
+  const prefix = new Date().getFullYear() + '-';
+  let max = 0;
+  (window.__allRecords || []).forEach(r => {
+    const n = String(r.number || '');
+    if (n.indexOf(prefix) === 0) {
+      const num = parseInt(n.slice(prefix.length), 10);
+      if (!isNaN(num) && num > max) max = num;
+    }
+  });
+  return prefix + String(max + 1).padStart(3, '0');
+}
+
+// prefill: 학생 목록에서 열면 이름·학생ID·학년 등이 미리 채워짐
+function openInputForm(prefill) {
+  prefill = prefill || {};
   ['dashboard-view', 'student-view', 'report-a4', 'report-mobile'].forEach(id => {
     const el = document.getElementById(id); if (el) el.classList.add('hidden');
   });
   const back = document.getElementById('btn-back'); if (back) back.classList.add('hidden');
   document.getElementById('input-view').classList.remove('hidden');
-  // 오늘 날짜 기본값
+
+  const discEl = document.getElementById('in-discipline');
+  if (prefill.discipline && DISCIPLINES[prefill.discipline]) discEl.value = prefill.discipline;
+
+  const put = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  put('in-name', prefill.name);
+  put('in-studentId', prefill.studentId);
+  put('in-grade', prefill.grade);
+  put('in-track', prefill.track);
+  put('in-genre', prefill.genre);
+  put('in-trainer', prefill.trainer);
+  put('in-number', nextDiagnosisNumber());   // 진단번호 자동
   const d = new Date();
-  const dateEl = document.getElementById('in-date');
-  if (dateEl && !dateEl.value) dateEl.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  put('in-date', `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+
   buildScoreInputs();
   setInStatus('', '');
+}
+
+// 현재 보고 있는 학생으로 새 진단 작성 (이름·학생ID 등 자동 채움)
+function newForCurrentStudent() {
+  const r = (window.__studentRecords || [])[0];
+  if (!r) { openInputForm(); return; }
+  const col = DISCIPLINES[r.discipline].columns;
+  const g = i => (r.cells && r.cells[i] && r.cells[i].v != null) ? r.cells[i].v : '';
+  openInputForm({
+    discipline: r.discipline,
+    name: r.name,
+    studentId: g(col.studentId),
+    grade: g(col.grade),
+    track: g(col.track),
+    genre: g(col.genre),
+    trainer: g(col.trainer),
+  });
 }
 
 // 선택한 종목의 점수 항목별 입력칸 생성
