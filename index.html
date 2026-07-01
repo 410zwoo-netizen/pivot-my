@@ -655,7 +655,7 @@ body {
 const SHEET_ID = '1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4'; // ← 박힘
 // (선택) 시트 저장용 Apps Script 웹앱 URL — 안내대로 배포 후 여기 붙여넣기.
 // 비워두면 저장 없이 리포트 생성만 됨.
-const SAVE_URL = '';
+const SAVE_URL = 'https://script.google.com/macros/s/AKfycbxOPAmBHEm_6wHsGpihE2t8o_G_hHjxrGm4-jiJVTvO-kS0he-gpY2XWFum5WN-yAVR6Q/exec';
 // ========================================
 // 종목 설정 (댄스 / 보컬) — 유일한 기준
 // ★ 항목 추가나 종목 추가는 여기만 수정하면 레이더·점수줄·평균이 자동 반영됨.
@@ -1734,18 +1734,22 @@ function submitNewDiagnosis() {
   saveRow(disc, cells, col);
 }
 
-// Apps Script 웹앱으로 한 줄 저장 (no-cors: 요청은 전달되나 응답은 못 읽음)
+// Apps Script 웹앱으로 한 줄 저장 (응답을 읽어 성공/실패 표시)
 function saveRow(disc, cells, col) {
-  if (!SAVE_URL) { console.log('SAVE_URL 미설정 → 저장 생략(생성만 됨)'); return; }
+  if (!SAVE_URL) return;
   const maxCol = Math.max(col.schedule, ...DISCIPLINES[disc].items.map(it => it.col));
   const row = [];
   for (let i = 0; i <= maxCol; i++) row[i] = (cells[i] && cells[i].v != null) ? cells[i].v : '';
+  showDebugBox('저장 중…', 'success');
   fetch(SAVE_URL, {
-    method: 'POST', mode: 'no-cors',
+    method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ discipline: disc, row: row }),
-  }).then(() => console.log('시트 저장 요청 전송됨'))
-    .catch(err => console.error('저장 실패', err));
+  }).then(r => r.json()).then(res => {
+    if (res && res.ok) showDebugBox('✓ 시트에 저장됨', 'success');
+    else showDebugBox('⚠️ 저장 실패: ' + ((res && res.error) || '알 수 없음'), 'error');
+    setTimeout(() => { const b = document.getElementById('debug-box'); if (b) b.style.display = 'none'; }, 3500);
+  }).catch(err => showDebugBox('⚠️ 저장 요청 실패: ' + err.message, 'error'));
 }
 
 // 이력 목록 화면 렌더
