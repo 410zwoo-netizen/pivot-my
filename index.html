@@ -82,6 +82,42 @@ body {
 /* 간소화 버전 푸터는 space-between이 바닥 정렬을 담당 (auto 마진 불필요) */
 .report.a4.simple .footer-multi { margin-top: 0; }
 
+/* === 학생 이력 목록 (강사용) === */
+#student-view {
+  width: 794px; max-width: 94vw; margin: 0 auto; padding: 28px 32px;
+  background: #FFFFFF; color: #0E1B3A; border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.sv-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding-bottom: 14px; border-bottom: 2px solid #0E1B3A; margin-bottom: 16px;
+}
+.sv-label { font-size: 11px; letter-spacing: 0.2em; color: #D4AF37; font-weight: 700; margin-bottom: 4px; }
+.sv-head h2 { font-size: 24px; font-weight: 800; }
+.sv-filters { display: flex; gap: 6px; }
+.sv-filter {
+  padding: 6px 14px; border: 1px solid rgba(14,27,58,0.2); background: #fff;
+  border-radius: 5px; font-size: 12px; font-weight: 700; color: #0E1B3A; cursor: pointer;
+}
+.sv-filter.active { background: #0E1B3A; color: #fff; border-color: #0E1B3A; }
+#history-list { display: flex; flex-direction: column; gap: 8px; }
+.hist-item {
+  display: grid; grid-template-columns: 64px 1fr auto auto; align-items: center; gap: 14px;
+  width: 100%; text-align: left; padding: 14px 16px; cursor: pointer;
+  background: #FAF8F0; border: 1px solid rgba(14,27,58,0.08); border-left: 4px solid #D4AF37;
+  border-radius: 0 6px 6px 0; font-family: inherit;
+}
+.hist-item:hover { background: #F3EFE0; }
+.hi-disc { font-size: 12px; font-weight: 800; text-align: center; padding: 3px 0; border-radius: 4px; color: #fff; }
+.hi-disc.dance { background: #C8302E; }
+.hi-disc.vocal { background: #2E6FC8; }
+.hist-item .hi-date { font-size: 14px; font-weight: 700; }
+.hist-item .hi-avg { font-size: 13px; font-weight: 700; color: #0E1B3A; }
+.hist-item .hi-no { font-size: 11px; color: rgba(14,27,58,0.5); }
+.hist-empty { color: rgba(14,27,58,0.5); padding: 24px; text-align: center; }
+.sv-hint { margin-top: 14px; font-size: 12px; color: rgba(14,27,58,0.55); text-align: center; }
+#btn-back { background: #D4AF37; color: #0E1B3A; font-weight: 700; }
+
 .header { 
   display: flex; justify-content: space-between; align-items: flex-start;
   padding-bottom: 14px; border-bottom: 2px solid #0E1B3A;
@@ -284,6 +320,7 @@ body {
 
 <div class="toggle-bar">
   <strong style="color: #D4AF37;">📋 PIVOT 진단서</strong>
+  <button id="btn-back" class="hidden" onclick="backToList()">← 목록</button>
   <button id="btn-a4" class="active" onclick="show('a4')">A4 (처방 포함)</button>
   <button id="btn-mobile" onclick="show('mobile')">A4 (처방 제외)</button>
   <span class="lang-section">
@@ -296,6 +333,23 @@ body {
   <button onclick="runDiagnose()" style="background:#C8302E;color:#fff;border:none;padding:6px 12px;border-radius:4px;font-weight:700;font-size:11px;cursor:pointer;margin-left:8px;">🔍 진단</button>
   <span class="status" id="data-status">샘플 데이터</span>
   <span class="info">Ctrl/Cmd + P로 PDF 저장</span>
+</div>
+
+<!-- 학생 이력 목록 (강사용 · ?student=학생ID 로 접속) -->
+<div id="student-view" class="hidden">
+  <div class="sv-head">
+    <div>
+      <p class="sv-label">학생 진단 이력</p>
+      <h2 id="sv-name">학생</h2>
+    </div>
+    <div class="sv-filters">
+      <button class="sv-filter active" data-filter="all" onclick="filterHistory('all')">전체</button>
+      <button class="sv-filter" data-filter="dance" onclick="filterHistory('dance')">댄스</button>
+      <button class="sv-filter" data-filter="vocal" onclick="filterHistory('vocal')">보컬</button>
+    </div>
+  </div>
+  <div id="history-list"></div>
+  <p class="sv-hint">항목을 클릭하면 진단서가 열립니다. 상단 "← 목록"으로 언제든 돌아올 수 있어요.</p>
 </div>
 
 <!-- A4 -->
@@ -477,39 +531,60 @@ body {
 // 연결된 시트: PIVOT 진단 데이터
 // https://docs.google.com/spreadsheets/d/1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4/edit
 const SHEET_ID = '1NKRJfO6V0GtjyDLAUDg4gnH7VE1IOebnGhDfDfAekU4'; // ← 박힘
-const SHEET_NAME = '시트1'; // 시트 탭 이름
-
-// 시트 열 구성 — 점수 외 필드 (점수 7개는 아래 ITEMS 에서 관리)
-const COLUMNS = {
-  number: 0,       // A: 진단번호
-  date: 1,         // B: 진단일자 (강사 입력: 6/20)
-  trainer: 2,      // C: 진단 트레이너
-  name: 3,         // D: 학생 이름
-  grade: 4,        // E: 학년
-  track: 5,        // F: 트랙 (입시/아이돌/댄서/취미)
-  genre: 6,        // G: 장르
-  // H~N: 진단 점수 7개 → ITEMS 참조
-  strength: 14,    // O: 강점
-  weakness: 15,    // P: 보완 필요
-  comment: 16,     // Q: 최종평가
-  rec_class: 17,   // R: 추천 클래스
-  rec_trainer: 18, // S: 추천 트레이너
-  schedule: 19     // T: 주간 일정
+// ========================================
+// 종목 설정 (댄스 / 보컬) — 유일한 기준
+// ★ 항목 추가나 종목 추가는 여기만 수정하면 레이더·점수줄·평균이 자동 반영됨.
+//   두 종목 모두 시트 앞부분(학생ID~장르)은 동일, 점수 개수만 다름(댄스7·보컬6).
+//   시트 열: A학생ID B진단번호 C진단일자 D트레이너 E이름 F학년 G트랙 H장르
+//            I~ 점수들 → 그 뒤 강점·보완필요·최종평가·추천클래스·추천트레이너·주간일정
+// ========================================
+const DISCIPLINES = {
+  dance: {
+    label: '댄스',
+    tab: '댄스',                       // 시트 탭 이름
+    items: [                           // 점수 항목 (I열부터, 7개)
+      { key: 'score_rhythm',    col: 8  },  // I: 리듬 & 그루브
+      { key: 'score_iso',       col: 9  },  // J: 아이솔레이션
+      { key: 'score_expr',      col: 10 },  // K: 표현력
+      { key: 'score_learn',     col: 11 },  // L: 습득력
+      { key: 'score_potential', col: 12 },  // M: 잠재력
+      { key: 'score_angle',     col: 13 },  // N: 앵글
+      { key: 'score_power',     col: 14 },  // O: 힘 (완급조절)
+    ],
+    columns: { studentId:0, number:1, date:2, trainer:3, name:4, grade:5, track:6, genre:7,
+      strength:15, weakness:16, comment:17, rec_class:18, rec_trainer:19, schedule:20 },
+  },
+  vocal: {
+    label: '보컬',
+    tab: '보컬',                       // 시트 탭 이름
+    items: [                           // 점수 항목 (I열부터, 6개)
+      { key: 'score_v_rhythm',col: 8  },  // I: 리듬
+      { key: 'score_breath',  col: 9  },  // J: 발성
+      { key: 'score_diction', col: 10 },  // K: 발음
+      { key: 'score_copy',    col: 11 },  // L: 카피력
+      { key: 'score_expr',    col: 12 },  // M: 표현력
+      { key: 'score_pitch',   col: 13 },  // N: 음정
+    ],
+    columns: { studentId:0, number:1, date:2, trainer:3, name:4, grade:5, track:6, genre:7,
+      strength:14, weakness:15, comment:16, rec_class:17, rec_trainer:18, schedule:19 },
+  },
 };
 
-// 진단 항목 (유일한 기준) — 순서 = 시트 점수 열(H~) = 레이더/점수줄 순서
-// ★ 항목 추가 시(예: 스타일링·에티튜드): 이 배열에 { key, col } 한 줄 +
-//   I18N 각 언어에 key 라벨 한 줄만 추가하면 끝.
-//   (레이더 격자·축선·라벨, 점수줄, 평균이 모두 자동 반영됨)
-const ITEMS = [
-  { key: 'score_rhythm',    col: 7  },  // H: 리듬 & 그루브
-  { key: 'score_iso',       col: 8  },  // I: 아이솔레이션
-  { key: 'score_expr',      col: 9  },  // J: 표현력
-  { key: 'score_learn',     col: 10 },  // K: 습득력
-  { key: 'score_potential', col: 11 },  // L: 잠재력
-  { key: 'score_angle',     col: 12 },  // M: 앵글
-  { key: 'score_power',     col: 13 },  // N: 힘 (완급조절)
-];
+// 활성 종목 — setDiscipline()이 ITEMS/COLUMNS를 바꿔주므로 렌더 코드는 그대로 사용
+let currentDiscipline = 'dance';
+let ITEMS = DISCIPLINES[currentDiscipline].items;
+let COLUMNS = DISCIPLINES[currentDiscipline].columns;
+
+// 종목 전환: 활성 항목/열을 바꾸고 레이더·점수줄을 다시 그림
+function setDiscipline(d) {
+  if (!DISCIPLINES[d]) return;
+  currentDiscipline = d;
+  ITEMS = DISCIPLINES[d].items;
+  COLUMNS = DISCIPLINES[d].columns;
+  buildScoreRows();
+  renderRadarChrome('radar-a4');
+  renderRadarChrome('radar-mobile');
+}
 
 // ========================================
 // 등급 시스템 + 차트 좌표
@@ -690,6 +765,7 @@ const I18N = {
     score_potential: '잠재력',
     score_angle: '앵글',
     score_power: '힘 (완급조절)',
+    score_v_rhythm: '리듬', score_breath: '발성', score_diction: '발음', score_copy: '카피력', score_pitch: '음정',
     avg_label: '7개 항목 평균',
     avg_label_short: '평균',
     grade_basic: '기초 (0~3.5)',
@@ -824,6 +900,7 @@ const I18N = {
     score_potential: 'Potential',
     score_angle: 'Angle',
     score_power: 'Dynamics',
+    score_v_rhythm: 'Rhythm', score_breath: 'Vocalization', score_diction: 'Diction', score_copy: 'Copying', score_pitch: 'Pitch',
     avg_label: 'Overall Average',
     avg_label_short: 'Average',
     grade_basic: 'Basic (0-3.5)',
@@ -954,6 +1031,7 @@ const I18N = {
     score_potential: 'ポテンシャル',
     score_angle: 'アングル',
     score_power: 'ダイナミクス',
+    score_v_rhythm: 'リズム', score_breath: '発声', score_diction: '発音', score_copy: 'コピー力', score_pitch: '音程',
     avg_label: '7項目平均',
     avg_label_short: '平均',
     grade_basic: '基礎 (0~3.5)',
@@ -1084,6 +1162,7 @@ const I18N = {
     score_potential: '潜力',
     score_angle: '角度',
     score_power: '力度控制',
+    score_v_rhythm: '节奏', score_breath: '发声', score_diction: '咬字', score_copy: '模唱力', score_pitch: '音准',
     avg_label: '7项平均',
     avg_label_short: '平均',
     grade_basic: '基础 (0~3.5)',
@@ -1343,85 +1422,133 @@ async function runDiagnose() {
   document.body.appendChild(modal);
 }
 
+// ===== 시트 통신 (gviz) =====
+function sheetUrl(tab) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}`;
+}
+async function fetchTab(tab) {
+  const res = await fetch(sheetUrl(tab));
+  if (!res.ok) throw new Error(`HTTP ${res.status} (탭 "${tab}" 공개/존재 확인)`);
+  const text = await res.text();
+  if (text.length < 50) throw new Error(`응답이 너무 짧음 (탭 "${tab}")`);
+  const json = JSON.parse(text.substring(47, text.length - 2));
+  if (!json.table || !json.table.rows) throw new Error(`데이터 구조 오류 (탭 "${tab}")`);
+  return json.table.rows.filter(r => r && r.c);
+}
+
+// ===== 라우팅 =====
+// ?student=학생ID                         → 그 학생의 보컬·댄스 이력 목록
+// ?id=진단번호 (&discipline=dance|vocal)  → 단건 리포트 (학생에게 보낼 링크)
+// 파라미터 없음                            → 샘플 데이터
 async function loadFromSheet() {
   const params = new URLSearchParams(window.location.search);
+  const studentId = params.get('student');
   const id = params.get('id');
   const statusEl = document.getElementById('data-status');
-  
-  if (!id) {
-    if (statusEl) statusEl.textContent = '샘플 데이터 (URL에 ?id=2026-001 추가 시 시트 연동)';
-    return;
-  }
-  
-  if (!SHEET_ID) {
-    showDebugBox('⚠️ 시트 ID 미설정', 'error');
-    return;
-  }
-  
+
+  if (studentId) return loadStudent(studentId, statusEl);
+  if (id) return loadSingle(params.get('discipline') || 'dance', id, statusEl);
+
+  if (statusEl) statusEl.textContent = '샘플 데이터 (?student=학생ID 또는 ?id=진단번호 로 시트 연동)';
+}
+
+// 단건 리포트 로드
+async function loadSingle(discipline, id, statusEl) {
+  if (!DISCIPLINES[discipline]) discipline = 'dance';
+  setDiscipline(discipline);
+  const dcfg = DISCIPLINES[discipline];
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
-    
-    const res = await fetch(url);
-    
-    if (!res.ok) {
-      showDebugBox(`⚠️ 시트 접근 실패 (HTTP ${res.status})\n시트가 "링크가 있는 모든 사용자"로 공개되어 있는지 확인하세요.`, 'error');
+    const rows = await fetchTab(dcfg.tab);
+    const col = dcfg.columns;
+    const target = rows.find(r => r.c[col.number] && r.c[col.number].v == id);
+    if (!target) {
+      const allIds = rows.map(r => r.c[col.number] && r.c[col.number].v).filter(Boolean).join(', ');
+      showDebugBox(`⚠️ [${dcfg.label}] 진단번호 "${id}" 미발견\n있는 번호: ${allIds || '(없음)'}`, 'error');
       return;
     }
-    
-    const text = await res.text();
-    
-    // gviz 응답이 JSONP라 앞 47자 잘라야 함. 응답 형식 확인
-    if (text.length < 50) {
-      showDebugBox(`⚠️ 시트 응답이 너무 짧음 (${text.length}자)\n시트가 공개되어 있는지, 시트1 탭이 존재하는지 확인.`, 'error');
-      return;
-    }
-    
-    let json;
-    try {
-      json = JSON.parse(text.substring(47, text.length - 2));
-    } catch (e) {
-      showDebugBox(`⚠️ 시트 응답 파싱 실패: ${e.message}\n앞 100자: ${text.substring(0, 100)}`, 'error');
-      return;
-    }
-    
-    if (!json.table || !json.table.rows) {
-      showDebugBox(`⚠️ 시트 데이터 구조 오류 (table 또는 rows 없음)\n시트1 탭 이름과 데이터 확인하세요.`, 'error');
-      return;
-    }
-    
-    const rows = json.table.rows;
-    
-    if (rows.length === 0) {
-      showDebugBox(`⚠️ 시트가 비어있음 (행 0개)\nA2에 ${id} 입력했는지 확인.`, 'error');
-      return;
-    }
-    
-    const targetRow = rows.find(r => 
-      r.c && r.c[COLUMNS.number] && r.c[COLUMNS.number].v == id
-    );
-    
-    if (!targetRow) {
-      // 시트의 모든 진단번호 나열
-      const allIds = rows.map(r => r.c && r.c[0] && r.c[0].v).filter(v => v).join(', ');
-      showDebugBox(`⚠️ 진단번호 "${id}" 미발견\n시트에 있는 진단번호: ${allIds || '(없음)'}`, 'error');
-      return;
-    }
-    
-    applyData(targetRow.c);
-    showDebugBox(`✓ 시트 데이터 로드 성공 (No. ${id})`, 'success');
-    // 3초 후 자동 숨김
-    setTimeout(() => {
-      const box = document.getElementById('debug-box');
-      if (box) box.style.display = 'none';
-    }, 3000);
-    
+    applyData(target.c);
+    showDebugBox(`✓ 로드 성공 (${dcfg.label} No. ${id})`, 'success');
+    setTimeout(() => { const b = document.getElementById('debug-box'); if (b) b.style.display = 'none'; }, 3000);
     if (statusEl) statusEl.classList.add('loaded');
   } catch (err) {
     console.error(err);
-    statusEl.textContent = '⚠️ 시트 로드 실패';
-    statusEl.classList.add('error');
+    showDebugBox(`⚠️ 시트 로드 실패: ${err.message}\n시트가 "링크가 있는 모든 사용자"로 공개됐는지 확인.`, 'error');
   }
 }
+
+// 학생 이력: 두 탭에서 학생ID 일치 행을 모아 목록 표시
+async function loadStudent(studentId, statusEl) {
+  const records = [];
+  for (const key of Object.keys(DISCIPLINES)) {
+    const dcfg = DISCIPLINES[key];
+    let rows;
+    try { rows = await fetchTab(dcfg.tab); }
+    catch (e) { console.warn(`${dcfg.tab} 탭 로드 실패`, e); continue; }
+    const col = dcfg.columns;
+    rows.forEach(r => {
+      const sid = r.c[col.studentId] && r.c[col.studentId].v;
+      if (sid == null || String(sid).trim() !== String(studentId).trim()) return;
+      const scores = dcfg.items.map(it => Number(r.c[it.col] && r.c[it.col].v) || 0);
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      records.push({
+        discipline: key,
+        cells: r.c,
+        number: (r.c[col.number] && r.c[col.number].v) || '',
+        name: (r.c[col.name] && r.c[col.name].v) || '',
+        dateText: formatDate(r.c[col.date] && r.c[col.date].v, r.c[col.date] && r.c[col.date].f),
+        avg: avg.toFixed(1),
+      });
+    });
+  }
+  if (records.length === 0) {
+    showDebugBox(`⚠️ 학생ID "${studentId}" 기록 없음\n댄스·보컬 탭 A열(학생ID)을 확인하세요.`, 'error');
+    return;
+  }
+  // 진단번호 역순(최신 먼저) 정렬
+  records.sort((a, b) => String(b.number).localeCompare(String(a.number)));
+  window.__studentRecords = records;
+  const backBtn = document.getElementById('btn-back');
+  if (backBtn) backBtn.classList.remove('hidden');
+  renderHistoryList(records, 'all');
+  if (statusEl) { statusEl.textContent = `${records[0].name || studentId} · 진단 ${records.length}건`; statusEl.classList.add('loaded'); }
+}
+
+// 이력 목록 화면 렌더
+function renderHistoryList(records, filter) {
+  const view = document.getElementById('student-view');
+  const listEl = document.getElementById('history-list');
+  if (!view || !listEl) return;
+  document.getElementById('report-a4').classList.add('hidden');
+  document.getElementById('report-mobile').classList.add('hidden');
+  view.classList.remove('hidden');
+  const nameEl = document.getElementById('sv-name');
+  if (nameEl) nameEl.textContent = (records[0] && records[0].name) || '학생';
+  document.querySelectorAll('.sv-filter').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+  const shown = records.filter(r => filter === 'all' || r.discipline === filter);
+  listEl.innerHTML = shown.map(r =>
+    `<button class="hist-item" onclick="openRecord(${records.indexOf(r)})">
+      <span class="hi-disc ${r.discipline}">${DISCIPLINES[r.discipline].label}</span>
+      <span class="hi-date">${r.dateText || '-'}</span>
+      <span class="hi-avg">평균 ${r.avg}</span>
+      <span class="hi-no">No.${r.number}</span>
+    </button>`
+  ).join('') || '<p class="hist-empty">해당 종목 기록이 없습니다.</p>';
+}
+
+// 목록에서 레코드 선택 → 리포트 열기
+function openRecord(index) {
+  const rec = (window.__studentRecords || [])[index];
+  if (!rec) return;
+  setDiscipline(rec.discipline);
+  applyData(rec.cells);
+  document.getElementById('student-view').classList.add('hidden');
+  const mobileActive = document.getElementById('btn-mobile') && document.getElementById('btn-mobile').classList.contains('active');
+  show(mobileActive ? 'mobile' : 'a4');
+}
+
+// 목록으로 돌아가기 / 종목 필터
+function backToList() { if (window.__studentRecords) renderHistoryList(window.__studentRecords, 'all'); }
+function filterHistory(f) { if (window.__studentRecords) renderHistoryList(window.__studentRecords, f); }
 
 function getCellValue(cells, idx) {
   return (cells[idx] && cells[idx].v !== null) ? cells[idx].v : '';
@@ -1597,6 +1724,8 @@ function applyData(cells) {
 }
 
 function show(type) {
+  const sv = document.getElementById('student-view');
+  if (sv) sv.classList.add('hidden');
   document.getElementById('report-a4').classList.toggle('hidden', type !== 'a4');
   document.getElementById('report-mobile').classList.toggle('hidden', type !== 'mobile');
   document.getElementById('btn-a4').classList.toggle('active', type === 'a4');
