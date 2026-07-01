@@ -117,6 +117,7 @@ body {
 .hist-empty { color: rgba(14,27,58,0.5); padding: 24px; text-align: center; }
 .sv-hint { margin-top: 14px; font-size: 12px; color: rgba(14,27,58,0.55); text-align: center; }
 #btn-back { background: #D4AF37; color: #0E1B3A; font-weight: 700; }
+#btn-edit { background: #2E6FC8; color: #fff; font-weight: 700; }
 
 /* === 전체 학생 대시보드 === */
 #dashboard-view {
@@ -383,6 +384,7 @@ body {
 <div class="toggle-bar">
   <strong style="color: #D4AF37;">📋 PIVOT 진단서</strong>
   <button id="btn-back" class="hidden" onclick="reportBack()">← 뒤로</button>
+  <button id="btn-edit" class="hidden" onclick="editCurrentRecord()">✎ 수정</button>
   <button id="btn-a4" class="active" onclick="show('a4')">A4 (처방 포함)</button>
   <button id="btn-mobile" onclick="show('mobile')">A4 (처방 제외)</button>
   <span class="lang-section">
@@ -437,7 +439,7 @@ body {
   <div class="sv-head">
     <div>
       <button class="sv-back" onclick="backToDashboard()">← 전체 학생</button>
-      <h2>새 진단 작성</h2>
+      <h2 id="in-title">새 진단 작성</h2>
     </div>
     <select id="in-discipline" class="in-select" onchange="buildScoreInputs()">
       <option value="dance">댄스</option>
@@ -469,7 +471,7 @@ body {
   <label class="form-full">최종 평가 <textarea id="in-comment" rows="3" placeholder="한줄 총평"></textarea></label>
 
   <div class="form-actions">
-    <button class="form-submit" onclick="submitNewDiagnosis()">진단서 생성 &amp; 저장</button>
+    <button class="form-submit" id="in-submit" onclick="submitNewDiagnosis()">진단서 생성 &amp; 저장</button>
     <span id="in-status" class="in-status"></span>
   </div>
 </div>
@@ -1567,7 +1569,7 @@ function showDashboard() {
   document.getElementById('report-mobile').classList.add('hidden');
   const sv = document.getElementById('student-view'); if (sv) sv.classList.add('hidden');
   const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.remove('hidden');
-  const back = document.getElementById('btn-back'); if (back) back.classList.add('hidden');
+  ['btn-back', 'btn-edit'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
   renderDashboard();
 }
 
@@ -1634,17 +1636,21 @@ function nextDiagnosisNumber() {
   return prefix + String(max + 1).padStart(3, '0');
 }
 
-// prefill: 학생 목록에서 열면 이름·학생ID·학년 등이 미리 채워짐
+// prefill: 학생 목록에서 열면 이름 등이 채워지고, 수정 시엔 모든 값 + editNumber가 옴
 function openInputForm(prefill) {
   prefill = prefill || {};
   ['dashboard-view', 'student-view', 'report-a4', 'report-mobile'].forEach(id => {
     const el = document.getElementById(id); if (el) el.classList.add('hidden');
   });
-  const back = document.getElementById('btn-back'); if (back) back.classList.add('hidden');
+  ['btn-back', 'btn-edit'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
   document.getElementById('input-view').classList.remove('hidden');
+
+  const isEdit = !!prefill.editNumber;
+  window.__editMode = isEdit ? { number: prefill.editNumber, discipline: prefill.discipline || 'dance' } : null;
 
   const discEl = document.getElementById('in-discipline');
   if (prefill.discipline && DISCIPLINES[prefill.discipline]) discEl.value = prefill.discipline;
+  discEl.disabled = isEdit; // 수정 시 종목 고정(열 구성이 달라서)
 
   const put = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
   put('in-name', prefill.name);
@@ -1653,12 +1659,50 @@ function openInputForm(prefill) {
   put('in-track', prefill.track);
   put('in-genre', prefill.genre);
   put('in-trainer', prefill.trainer);
-  put('in-number', nextDiagnosisNumber());   // 진단번호 자동
+  put('in-strength', prefill.strength);
+  put('in-weakness', prefill.weakness);
+  put('in-comment', prefill.comment);
+  put('in-rec_class', prefill.rec_class);
+  put('in-rec_trainer', prefill.rec_trainer);
+  put('in-schedule', prefill.schedule);
+  put('in-number', prefill.number || nextDiagnosisNumber());   // 진단번호 자동(수정 시 기존 번호)
   const d = new Date();
-  put('in-date', `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
+  put('in-date', prefill.date || `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`);
 
   buildScoreInputs();
+  if (prefill.scores) {
+    DISCIPLINES[discEl.value].items.forEach(it => {
+      const el = document.getElementById('in-score-' + it.key);
+      if (el && prefill.scores[it.key] != null && prefill.scores[it.key] !== '') el.value = prefill.scores[it.key];
+    });
+  }
+
+  const titleEl = document.getElementById('in-title'); if (titleEl) titleEl.textContent = isEdit ? '진단 수정' : '새 진단 작성';
+  const submitEl = document.getElementById('in-submit'); if (submitEl) submitEl.textContent = isEdit ? '수정 저장' : '진단서 생성 & 저장';
   setInStatus('', '');
+}
+
+// 기존 레코드 → 폼 프리필 객체
+function recordToPrefill(rec) {
+  const col = DISCIPLINES[rec.discipline].columns;
+  const g = i => (rec.cells && rec.cells[i] && rec.cells[i].v != null) ? String(rec.cells[i].v) : '';
+  const scores = {};
+  DISCIPLINES[rec.discipline].items.forEach(it => { scores[it.key] = g(it.col); });
+  let dv = g(col.date);
+  const m = dv.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  const dateInput = m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : '';
+  return {
+    editNumber: rec.number, discipline: rec.discipline,
+    name: g(col.name), studentId: g(col.studentId), number: rec.number, date: dateInput,
+    trainer: g(col.trainer), grade: g(col.grade), track: g(col.track), genre: g(col.genre),
+    scores: scores, strength: g(col.strength), weakness: g(col.weakness), comment: g(col.comment),
+    rec_class: g(col.rec_class), rec_trainer: g(col.rec_trainer), schedule: g(col.schedule),
+  };
+}
+
+// 현재 보고 있는 진단을 수정
+function editCurrentRecord() {
+  if (window.__currentRecord) openInputForm(recordToPrefill(window.__currentRecord));
 }
 
 // 현재 보고 있는 학생으로 새 진단 작성 (이름·학생ID 등 자동 채움)
@@ -1725,29 +1769,46 @@ function submitNewDiagnosis() {
 
   // 리포트 생성
   applyData(cells);
-  window.__reportOrigin = 'new';
+  const editMode = window.__editMode;
+  if (!editMode) window.__reportOrigin = 'new';
   document.getElementById('input-view').classList.add('hidden');
   show('a4');
   const back = document.getElementById('btn-back'); if (back) back.classList.remove('hidden');
 
-  // 시트 저장
-  saveRow(disc, cells, col);
+  // 시트 저장(새 진단) 또는 수정
+  if (editMode) saveRow(disc, cells, col, 'update', editMode.number);
+  else saveRow(disc, cells, col, 'create');
+
+  // 방금 내용을 현재 레코드로 → "수정" 버튼으로 다시 편집 가능
+  window.__currentRecord = { discipline: disc, cells: cells, number: val('in-number') };
+  window.__editMode = null;
+  const editBtn = document.getElementById('btn-edit'); if (editBtn) editBtn.classList.remove('hidden');
 }
 
-// Apps Script 웹앱으로 한 줄 저장 (응답을 읽어 성공/실패 표시)
-function saveRow(disc, cells, col) {
+// Apps Script 웹앱으로 저장(create) 또는 수정(update). 응답을 읽어 성공/실패 표시.
+function saveRow(disc, cells, col, action, number) {
   if (!SAVE_URL) return;
   const maxCol = Math.max(col.schedule, ...DISCIPLINES[disc].items.map(it => it.col));
   const row = [];
   for (let i = 0; i <= maxCol; i++) row[i] = (cells[i] && cells[i].v != null) ? cells[i].v : '';
-  showDebugBox('저장 중…', 'success');
+  const payload = { discipline: disc, row: row, action: action || 'create' };
+  if (action === 'update') payload.number = number;
+  showDebugBox(action === 'update' ? '수정 저장 중…' : '저장 중…', 'success');
   fetch(SAVE_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ discipline: disc, row: row }),
+    body: JSON.stringify(payload),
   }).then(r => r.json()).then(res => {
-    if (res && res.ok) showDebugBox('✓ 시트에 저장됨', 'success');
-    else showDebugBox('⚠️ 저장 실패: ' + ((res && res.error) || '알 수 없음'), 'error');
+    if (res && res.ok) {
+      // 서버가 부여한 진단번호를 리포트에 반영
+      if (res.number) {
+        document.querySelectorAll('[data-field="number"]').forEach(el => el.textContent = 'No. ' + res.number);
+        document.querySelectorAll('[data-field="stamp"]').forEach(el => el.textContent = 'No. ' + res.number);
+      }
+      showDebugBox(action === 'update' ? '✓ 수정 저장됨' : '✓ 시트에 저장됨', 'success');
+    } else {
+      showDebugBox('⚠️ 저장 실패: ' + ((res && res.error) || '알 수 없음'), 'error');
+    }
     setTimeout(() => { const b = document.getElementById('debug-box'); if (b) b.style.display = 'none'; }, 3500);
   }).catch(err => showDebugBox('⚠️ 저장 요청 실패: ' + err.message, 'error'));
 }
@@ -1761,6 +1822,7 @@ function renderHistoryList(records, filter) {
   document.getElementById('report-mobile').classList.add('hidden');
   const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.add('hidden');
   const bb = document.getElementById('btn-back'); if (bb) bb.classList.remove('hidden');
+  const eb = document.getElementById('btn-edit'); if (eb) eb.classList.add('hidden');
   view.classList.remove('hidden');
   const nameEl = document.getElementById('sv-name');
   if (nameEl) nameEl.textContent = (records[0] && records[0].name) || '학생';
@@ -1783,9 +1845,11 @@ function openRecord(index) {
   setDiscipline(rec.discipline);
   applyData(rec.cells);
   window.__reportOrigin = 'history';
+  window.__currentRecord = rec;
   document.getElementById('student-view').classList.add('hidden');
   const mobileActive = document.getElementById('btn-mobile') && document.getElementById('btn-mobile').classList.contains('active');
   show(mobileActive ? 'mobile' : 'a4');
+  const editBtn = document.getElementById('btn-edit'); if (editBtn) editBtn.classList.remove('hidden');
 }
 
 // 목록으로 돌아가기 / 종목 필터
