@@ -178,6 +178,11 @@ body {
   font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit;
 }
 .form-submit:hover { background: #a82724; }
+.form-cancel {
+  padding: 11px 20px; background: #fff; color: rgba(14,27,58,0.7); border: 1px solid rgba(14,27,58,0.25);
+  border-radius: 6px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.form-cancel:hover { background: #f2f2f2; }
 .in-status { font-size: 13px; font-weight: 700; }
 .in-status.ok { color: #2E9E4F; }
 .in-status.err { color: #C8302E; }
@@ -474,6 +479,7 @@ body {
 
   <div class="form-actions">
     <button class="form-submit" id="in-submit" onclick="submitNewDiagnosis()">진단서 생성 &amp; 저장</button>
+    <button class="form-cancel" onclick="cancelInputForm()">취소</button>
     <span id="in-status" class="in-status"></span>
   </div>
 </div>
@@ -1569,6 +1575,7 @@ async function loadAllRecords(statusEl) {
 function showDashboard() {
   document.getElementById('report-a4').classList.add('hidden');
   document.getElementById('report-mobile').classList.add('hidden');
+  const iv = document.getElementById('input-view'); if (iv) iv.classList.add('hidden');
   const sv = document.getElementById('student-view'); if (sv) sv.classList.add('hidden');
   const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.remove('hidden');
   ['btn-back', 'btn-edit', 'btn-delete'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
@@ -1736,6 +1743,13 @@ function editCurrentRecord() {
   if (window.__currentRecord) openInputForm(recordToPrefill(window.__currentRecord));
 }
 
+// 입력 폼 닫기(취소) → 대시보드로
+function cancelInputForm() {
+  window.__editMode = null;
+  const d = document.getElementById('in-discipline'); if (d) d.disabled = false;
+  showDashboard();
+}
+
 // 현재 보고 있는 학생으로 새 진단 작성 (이름·학생ID 등 자동 채움)
 function newForCurrentStudent() {
   const r = (window.__studentRecords || [])[0];
@@ -1856,6 +1870,7 @@ function renderHistoryList(records, filter) {
   document.getElementById('report-a4').classList.add('hidden');
   document.getElementById('report-mobile').classList.add('hidden');
   const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.add('hidden');
+  const iv = document.getElementById('input-view'); if (iv) iv.classList.add('hidden');
   const bb = document.getElementById('btn-back'); if (bb) bb.classList.remove('hidden');
   ['btn-edit', 'btn-delete'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
   view.classList.remove('hidden');
@@ -2067,6 +2082,7 @@ function applyData(cells) {
 function show(type) {
   const sv = document.getElementById('student-view');
   if (sv) sv.classList.add('hidden');
+  const iv = document.getElementById('input-view'); if (iv) iv.classList.add('hidden');
   document.getElementById('report-a4').classList.toggle('hidden', type !== 'a4');
   document.getElementById('report-mobile').classList.toggle('hidden', type !== 'mobile');
   document.getElementById('btn-a4').classList.toggle('active', type === 'a4');
