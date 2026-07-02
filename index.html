@@ -118,6 +118,7 @@ body {
 .sv-hint { margin-top: 14px; font-size: 12px; color: rgba(14,27,58,0.55); text-align: center; }
 #btn-back { background: #D4AF37; color: #0E1B3A; font-weight: 700; }
 #btn-edit { background: #2E6FC8; color: #fff; font-weight: 700; }
+#btn-delete { background: #C8302E; color: #fff; font-weight: 700; }
 
 /* === 전체 학생 대시보드 === */
 #dashboard-view {
@@ -385,6 +386,7 @@ body {
   <strong style="color: #D4AF37;">📋 PIVOT 진단서</strong>
   <button id="btn-back" class="hidden" onclick="reportBack()">← 뒤로</button>
   <button id="btn-edit" class="hidden" onclick="editCurrentRecord()">✎ 수정</button>
+  <button id="btn-delete" class="hidden" onclick="deleteCurrentRecord()">🗑 삭제</button>
   <button id="btn-a4" class="active" onclick="show('a4')">A4 (처방 포함)</button>
   <button id="btn-mobile" onclick="show('mobile')">A4 (처방 제외)</button>
   <span class="lang-section">
@@ -1569,7 +1571,7 @@ function showDashboard() {
   document.getElementById('report-mobile').classList.add('hidden');
   const sv = document.getElementById('student-view'); if (sv) sv.classList.add('hidden');
   const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.remove('hidden');
-  ['btn-back', 'btn-edit'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
+  ['btn-back', 'btn-edit', 'btn-delete'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
   renderDashboard();
 }
 
@@ -1615,10 +1617,39 @@ function openStudent(key) {
 }
 function backToDashboard() { showDashboard(); }
 
-// 리포트에서 뒤로: 이력에서 왔으면 이력으로, 새 진단에서 왔으면 대시보드로
+// 상단 "← 뒤로": 보이는 화면에 따라 알맞게 이동
 function reportBack() {
-  if (window.__reportOrigin === 'history' && window.__studentRecords) backToList();
+  // 이력 목록 화면이 열려 있으면 → 대시보드로
+  const listShown = !document.getElementById('student-view').classList.contains('hidden');
+  if (listShown) { showDashboard(); return; }
+  // 리포트 화면에서: 이력에서 왔으면 목록으로, 새 진단이면 대시보드로
+  if (window.__reportOrigin === 'history' && window.__studentRecords && window.__studentRecords.length) backToList();
   else showDashboard();
+}
+
+// 현재 진단 삭제 (되돌릴 수 없음 → 확인 후 진행)
+function deleteCurrentRecord() {
+  const rec = window.__currentRecord;
+  if (!rec) return;
+  if (!SAVE_URL) { showDebugBox('⚠️ 저장 URL 미설정 — 삭제하려면 SAVE_URL 필요', 'error'); return; }
+  if (!confirm(`이 진단(${rec.number})을 삭제할까요?\n되돌릴 수 없습니다.`)) return;
+  showDebugBox('삭제 중…', 'success');
+  fetch(SAVE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'delete', discipline: rec.discipline, number: rec.number }),
+  }).then(r => r.json()).then(res => {
+    if (res && res.ok) {
+      const rm = arr => { if (arr) for (let i = arr.length - 1; i >= 0; i--) if (arr[i].number === rec.number && arr[i].discipline === rec.discipline) arr.splice(i, 1); };
+      rm(window.__allRecords); rm(window.__studentRecords);
+      showDebugBox('✓ 삭제됨', 'success');
+      setTimeout(() => { const b = document.getElementById('debug-box'); if (b) b.style.display = 'none'; }, 2500);
+      if (window.__reportOrigin === 'history' && window.__studentRecords && window.__studentRecords.length) backToList();
+      else showDashboard();
+    } else {
+      showDebugBox('⚠️ 삭제 실패: ' + ((res && res.error) || '알 수 없음'), 'error');
+    }
+  }).catch(err => showDebugBox('⚠️ 삭제 요청 실패: ' + err.message, 'error'));
 }
 
 // ===== 새 진단 입력 폼 =====
@@ -1642,7 +1673,7 @@ function openInputForm(prefill) {
   ['dashboard-view', 'student-view', 'report-a4', 'report-mobile'].forEach(id => {
     const el = document.getElementById(id); if (el) el.classList.add('hidden');
   });
-  ['btn-back', 'btn-edit'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
+  ['btn-back', 'btn-edit', 'btn-delete'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
   document.getElementById('input-view').classList.remove('hidden');
 
   const isEdit = !!prefill.editNumber;
@@ -1782,7 +1813,7 @@ function submitNewDiagnosis() {
   // 방금 내용을 현재 레코드로 → "수정" 버튼으로 다시 편집 가능
   window.__currentRecord = { discipline: disc, cells: cells, number: val('in-number') };
   window.__editMode = null;
-  const editBtn = document.getElementById('btn-edit'); if (editBtn) editBtn.classList.remove('hidden');
+  ['btn-edit', 'btn-delete'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.remove('hidden'); });
 }
 
 // Apps Script 웹앱으로 저장(create) 또는 수정(update). 응답을 읽어 성공/실패 표시.
@@ -1822,7 +1853,7 @@ function renderHistoryList(records, filter) {
   document.getElementById('report-mobile').classList.add('hidden');
   const dv = document.getElementById('dashboard-view'); if (dv) dv.classList.add('hidden');
   const bb = document.getElementById('btn-back'); if (bb) bb.classList.remove('hidden');
-  const eb = document.getElementById('btn-edit'); if (eb) eb.classList.add('hidden');
+  ['btn-edit', 'btn-delete'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.add('hidden'); });
   view.classList.remove('hidden');
   const nameEl = document.getElementById('sv-name');
   if (nameEl) nameEl.textContent = (records[0] && records[0].name) || '학생';
@@ -1849,7 +1880,7 @@ function openRecord(index) {
   document.getElementById('student-view').classList.add('hidden');
   const mobileActive = document.getElementById('btn-mobile') && document.getElementById('btn-mobile').classList.contains('active');
   show(mobileActive ? 'mobile' : 'a4');
-  const editBtn = document.getElementById('btn-edit'); if (editBtn) editBtn.classList.remove('hidden');
+  ['btn-edit', 'btn-delete'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.remove('hidden'); });
 }
 
 // 목록으로 돌아가기 / 종목 필터

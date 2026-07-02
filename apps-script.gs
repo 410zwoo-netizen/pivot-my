@@ -32,6 +32,18 @@ function doPost(e) {
       return jsonOut({ ok: true, mode: 'update', row: found, cols: row.length });
     }
 
+    // ── 삭제: 진단번호(B열)로 행을 찾아 행 자체를 삭제 ──
+    if (data.action === 'delete') {
+      var dnums = sheet.getRange(1, 2, maxRows, 1).getValues();
+      for (var k = 0; k < dnums.length; k++) {
+        if (String(dnums[k][0]) === String(data.number)) {
+          sheet.deleteRow(k + 1);
+          return jsonOut({ ok: true, mode: 'delete', row: k + 1 });
+        }
+      }
+      return jsonOut({ ok: false, error: '삭제 대상 진단번호 없음: ' + data.number });
+    }
+
     // ── 새 진단: 진짜 마지막 데이터 행(E열=이름 기준) 다음에 기록 ──
     var names = sheet.getRange(1, 5, maxRows, 1).getValues();
     var last = 1;
